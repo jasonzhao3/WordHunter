@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cnTraining", "training\cnTraining.vcproj", "{A12E1842-4F38-4010-8E00-92C64CC04225}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mfTraining", "training\mfTraining.vcproj", "{DC72B20C-2192-48EA-9D92-542F6051F77E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tesseract", "tesseract.vcproj", "{32B763C2-DD60-45BF-A652-A590DAD8B2D3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A12E1842-4F38-4010-8E00-92C64CC04225}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A12E1842-4F38-4010-8E00-92C64CC04225}.Debug|Win32.Build.0 = Debug|Win32
+		{A12E1842-4F38-4010-8E00-92C64CC04225}.Release|Win32.ActiveCfg = Release|Win32
+		{A12E1842-4F38-4010-8E00-92C64CC04225}.Release|Win32.Build.0 = Release|Win32
+		{DC72B20C-2192-48EA-9D92-542F6051F77E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DC72B20C-2192-48EA-9D92-542F6051F77E}.Debug|Win32.Build.0 = Debug|Win32
+		{DC72B20C-2192-48EA-9D92-542F6051F77E}.Release|Win32.ActiveCfg = Release|Win32
+		{DC72B20C-2192-48EA-9D92-542F6051F77E}.Release|Win32.Build.0 = Release|Win32
+		{32B763C2-DD60-45BF-A652-A590DAD8B2D3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{32B763C2-DD60-45BF-A652-A590DAD8B2D3}.Debug|Win32.Build.0 = Debug|Win32
+		{32B763C2-DD60-45BF-A652-A590DAD8B2D3}.Release|Win32.ActiveCfg = Release|Win32
+		{32B763C2-DD60-45BF-A652-A590DAD8B2D3}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
