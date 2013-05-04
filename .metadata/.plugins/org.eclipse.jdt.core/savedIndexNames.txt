@@ -1,0 +1,8 @@
+INDEX VERSION 1.126+D:\_Stanford\Course Information\EE368\Project\.metadata\.plugins\org.eclipse.jdt.core
+3795331407.index
+1837067418.index
+2098628559.index
+384379222.index
+1060852812.index
+3117808472.index
+1043215172.index
