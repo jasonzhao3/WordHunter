@@ -1,0 +1,155 @@
+/**
+ * @author Yang Zhao
+ */
+package com.example.wordhunter;
+
+import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+
+/**
+ * @author Yang Zhao
+ * 
+ */
+public class Preview extends SurfaceView implements SurfaceHolder {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.view.SurfaceHolder#addCallback(android.view.SurfaceHolder.Callback
+	 * )
+	 */
+	@Override
+	public void addCallback(Callback arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.SurfaceHolder#getSurface()
+	 */
+	@Override
+	public Surface getSurface() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.SurfaceHolder#getSurfaceFrame()
+	 */
+	@Override
+	public Rect getSurfaceFrame() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.SurfaceHolder#isCreating()
+	 */
+	@Override
+	public boolean isCreating() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.SurfaceHolder#lockCanvas()
+	 */
+	@Override
+	public Canvas lockCanvas() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.SurfaceHolder#lockCanvas(android.graphics.Rect)
+	 */
+	@Override
+	public Canvas lockCanvas(Rect dirty) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.view.SurfaceHolder#removeCallback(android.view.SurfaceHolder.
+	 * Callback)
+	 */
+	@Override
+	public void removeCallback(Callback callback) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.SurfaceHolder#setFixedSize(int, int)
+	 */
+	@Override
+	public void setFixedSize(int width, int height) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.SurfaceHolder#setFormat(int)
+	 */
+	@Override
+	public void setFormat(int format) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.SurfaceHolder#setSizeFromLayout()
+	 */
+	@Override
+	public void setSizeFromLayout() {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.SurfaceHolder#setType(int)
+	 */
+	@Override
+	public void setType(int type) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.view.SurfaceHolder#unlockCanvasAndPost(android.graphics.Canvas)
+	 */
+	@Override
+	public void unlockCanvasAndPost(Canvas canvas) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

@@ -1,0 +1,10 @@
+package com.example.wordhunter;
+import android.view.View;
+
+/**
+ * @author Yang Zhao
+ * 
+ */
+public class LabelOnTop extends View {
+
+}

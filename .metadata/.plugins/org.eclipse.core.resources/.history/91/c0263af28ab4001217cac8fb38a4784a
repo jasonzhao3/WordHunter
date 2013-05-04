@@ -1,0 +1,52 @@
+/**
+ * @author Yang Zhao
+ */
+package com.example.wordhunter;
+
+import com.example.helloviewfinder.DrawOnTop;
+import com.example.helloviewfinder.Preview;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.View;
+import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
+import android.view.WindowManager;
+
+public class MainActivity extends Activity {
+	public final static String EXTRA_MESSAGE = "com.example.wordhunter.MESSAGE";
+	private Preview mPreview;
+	private DrawOnTop mDrawOnTop;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+
+	/** Called when the user clicks the Search button */
+	public void searchWord(View view) {
+		// Do something in response to button
+		// Hide the window title and set full screen
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+				WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+		// Create our Preview view and set it as the content of our activity.
+		// Create our DrawOnTop view.
+		mLabelOnTop = new LabelOnTop(this);
+		mPreview = new Preview(this, mLabelOnTop);
+		setContentView(mPreview);
+		addContentView(mLabelOnTop, new LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT));
+
+	}
+
+}

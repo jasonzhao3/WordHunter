@@ -1,3 +1,6 @@
+/**
+ * @author Yang Zhao
+ */
 package com.example.wordhunter;
 
 import android.app.Activity;
@@ -26,11 +29,11 @@ public class MainActivity extends Activity {
 	/** Called when the user clicks the Search button */
 	public void searchWord(View view) {
 		// Do something in response to button
-		Intent intent = new Intent(this, ConfirmSearchActivity.class);
+		// Hide the window title and set full screen
+		Intent intent = new Intent(this, WordHunterActivity.class);
 		EditText editText = (EditText) findViewById(R.id.edit_message);
 		String message = editText.getText().toString();
 		intent.putExtra(EXTRA_MESSAGE, message);
 		startActivity(intent);
 	}
-
 }

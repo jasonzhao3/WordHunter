@@ -1,0 +1,13 @@
+import android.view.View;
+
+/**
+ * @author Yang Zhao
+ */
+
+/**
+ * @author Yang Zhao
+ *
+ */
+public class LabelOnTop extends View {
+
+}

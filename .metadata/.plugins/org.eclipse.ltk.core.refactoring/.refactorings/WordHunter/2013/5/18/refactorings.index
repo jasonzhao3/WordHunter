@@ -1,2 +1,10 @@
 1367636824783	Delete element
 1367636899442	Delete element
+1367649716418	Delete element
+1367649723118	Delete element
+1367651401360	Move compilation unit
+1367651436333	Rename method 'DrawOnTop'
+1367651500311	Rename field 'mDrawOnTop'
+1367651523691	Rename local variable 'drawOnTop'
+1367651765086	Rename type 'LabelOnTop'
+1367651900663	Rename type 'labelOnTop'
