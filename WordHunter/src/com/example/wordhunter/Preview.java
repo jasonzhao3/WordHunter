@@ -1,6 +1,3 @@
-/**
- * @author Yang Zhao
- */
 package com.example.wordhunter;
 
 import java.io.IOException;
