@@ -83,88 +83,90 @@ imshow(img);
         disp(getReport(e,'extended'));
     end
     
-    %% (3) Segment out Lines, correct with RANSAC + Affine Transform
-%     system('del C:\wamp\www\upload\TessOutput.txt');
-    for li = 1:length(lineY)            
-        lineImg = MSERimg(boundaryLineY(li):boundaryLineY(li+1), :);
-        %imwrite(lineImg, 'lineImg.jpg');
-        %figure(10); imshow(lineImg); title('Original lineImg');
-            
-        % Find all regions with y-centroid within boundaryLineY(li) < CentY < boundaryLineY(li+1)
-        regAll = intersect(find(CentY > boundaryLineY(li)), find(CentY < boundaryLineY(li+1)));
-        lineCentX = CentX(regAll);
-        baselineY = BotY(regAll);
-        toplineY  = TopY(regAll);
-        
-                        
-        % (3a) Use RANSAC to find line running through inlier points
-            nSampLen = 2;     % Number of point for RANSAC Model Function
-            modelFcn = @TLS;  % Model function: Total least squared
-            nIter    = 50;    % Number of iterations for RANSAC algorithm
-            residFcn = @Dist; % Residuum function: Distance to line
-            dThreshold = 2;   % Threshold for residuum
-            
-            [RANSAC_maskBotY, RANSAC_BotY] = RANSAC([lineCentX; baselineY], modelFcn, nSampLen, residFcn, nIter, dThreshold);
-            figure(9), plot(lineCentX, baselineY, 'ob'); title('Bottom Y');
-            hold on; plot(lineCentX, -(RANSAC_BotY(1) * lineCentX + RANSAC_BotY(3))/RANSAC_BotY(2), 'r');
-            
-            [RANSAC_maskTopY, RANSAC_TopY] = RANSAC([lineCentX; toplineY], modelFcn, nSampLen, residFcn, nIter, dThreshold);
-            figure(10), plot(lineCentX, toplineY, 'ob'); title('Top Y');
-            hold on; plot(lineCentX, -(RANSAC_TopY(1) * lineCentX + RANSAC_TopY(3))/RANSAC_TopY(2), 'r');
-            
-            % X-centroid of leftmost and rightmost elements
-            minX = min(lineCentX(RANSAC_maskBotY));
-            maxX = max(lineCentX(RANSAC_maskBotY));
-            % Ends of baseline and topline as calculated from RANSAC models
-            baselineLeft  = -(RANSAC_BotY(1) * minX + RANSAC_BotY(3))/RANSAC_BotY(2);
-            baselineRight = -(RANSAC_BotY(1) * maxX + RANSAC_BotY(3))/RANSAC_BotY(2);
-            toplineLeft   = -(RANSAC_TopY(1) * minX + RANSAC_TopY(3))/RANSAC_TopY(2);
-            toplineRight  = -(RANSAC_TopY(1) * maxX + RANSAC_TopY(3))/RANSAC_TopY(2);
-
-        % (3b) Use affine transformation to correct for skew
-            % Points in Skewed Image
-            inputpoints = [minX baselineLeft-boundaryLineY(li); minX toplineLeft-boundaryLineY(li); maxX baselineRight-boundaryLineY(li); maxX toplineRight-boundaryLineY(li)];
-            % Points in Correct Image
-            basepoints = [minX max(1,baselineLeft-boundaryLineY(li)); minX max(1,toplineLeft-boundaryLineY(li)); maxX max(1,baselineLeft-boundaryLineY(li)); maxX max(1,toplineLeft-boundaryLineY(li))];
-            % Calculate affine transform from projection
-            tform = cp2tform(inputpoints, basepoints, 'projective');
-            
-            sizeLine = size(lineImg);
-            lineImgCorr = imtransform(lineImg, tform, 'XData', [1 sizeLine(2)], 'YData', [1 sizeLine(1)]);            
-            %figure(11), imshow(lineImgCorr); title('Corrected lineImgCorr');
-                                       
-            % (*Optional*) OCR by Individual Characters
-%                 lineRegLabels = bwlabel(lineImg,8);  %label the regions
-%                 %figure(5), imagesc(lineRegLabels);             
+    
+    
+%     %% (3) Segment out Lines, correct with RANSAC + Affine Transform
+% %     system('del C:\wamp\www\upload\TessOutput.txt');
+%     for li = 1:length(lineY)            
+%         lineImg = MSERimg(boundaryLineY(li):boundaryLineY(li+1), :);
+%         %imwrite(lineImg, 'lineImg.jpg');
+%         %figure(10); imshow(lineImg); title('Original lineImg');
+%             
+%         % Find all regions with y-centroid within boundaryLineY(li) < CentY < boundaryLineY(li+1)
+%         regAll = intersect(find(CentY > boundaryLineY(li)), find(CentY < boundaryLineY(li+1)));
+%         lineCentX = CentX(regAll);
+%         baselineY = BotY(regAll);
+%         toplineY  = TopY(regAll);
+%         
+%                         
+%         % (3a) Use RANSAC to find line running through inlier points
+%             nSampLen = 2;     % Number of point for RANSAC Model Function
+%             modelFcn = @TLS;  % Model function: Total least squared
+%             nIter    = 50;    % Number of iterations for RANSAC algorithm
+%             residFcn = @Dist; % Residuum function: Distance to line
+%             dThreshold = 2;   % Threshold for residuum
+%             
+%             [RANSAC_maskBotY, RANSAC_BotY] = RANSAC([lineCentX; baselineY], modelFcn, nSampLen, residFcn, nIter, dThreshold);
+%             figure(9), plot(lineCentX, baselineY, 'ob'); title('Bottom Y');
+%             hold on; plot(lineCentX, -(RANSAC_BotY(1) * lineCentX + RANSAC_BotY(3))/RANSAC_BotY(2), 'r');
+%             
+%             [RANSAC_maskTopY, RANSAC_TopY] = RANSAC([lineCentX; toplineY], modelFcn, nSampLen, residFcn, nIter, dThreshold);
+%             figure(10), plot(lineCentX, toplineY, 'ob'); title('Top Y');
+%             hold on; plot(lineCentX, -(RANSAC_TopY(1) * lineCentX + RANSAC_TopY(3))/RANSAC_TopY(2), 'r');
+%             
+%             % X-centroid of leftmost and rightmost elements
+%             minX = min(lineCentX(RANSAC_maskBotY));
+%             maxX = max(lineCentX(RANSAC_maskBotY));
+%             % Ends of baseline and topline as calculated from RANSAC models
+%             baselineLeft  = -(RANSAC_BotY(1) * minX + RANSAC_BotY(3))/RANSAC_BotY(2);
+%             baselineRight = -(RANSAC_BotY(1) * maxX + RANSAC_BotY(3))/RANSAC_BotY(2);
+%             toplineLeft   = -(RANSAC_TopY(1) * minX + RANSAC_TopY(3))/RANSAC_TopY(2);
+%             toplineRight  = -(RANSAC_TopY(1) * maxX + RANSAC_TopY(3))/RANSAC_TopY(2);
 % 
-%                 % '=' will have two regions that have almost same x-centroid
-%                 minCentXSeparation = 20;  % Assume characters are separated by at least this much
-%                 % Use bitMask to eliminate double counting x-centroid of '='
-%                 regMask  = logical([ (CentX(regAll(2:end)) - CentX(regAll(1:end-1)) > minCentXSeparation) 1]);  %bitMask 
-%                 % Get x-centroid of all characters
-%                 charX = [CentX( regAll(regMask) ) sizeImg(2)];
+%         % (3b) Use affine transformation to correct for skew
+%             % Points in Skewed Image
+%             inputpoints = [minX baselineLeft-boundaryLineY(li); minX toplineLeft-boundaryLineY(li); maxX baselineRight-boundaryLineY(li); maxX toplineRight-boundaryLineY(li)];
+%             % Points in Correct Image
+%             basepoints = [minX max(1,baselineLeft-boundaryLineY(li)); minX max(1,toplineLeft-boundaryLineY(li)); maxX max(1,baselineLeft-boundaryLineY(li)); maxX max(1,toplineLeft-boundaryLineY(li))];
+%             % Calculate affine transform from projection
+%             tform = cp2tform(inputpoints, basepoints, 'projective');
+%             
+%             sizeLine = size(lineImg);
+%             lineImgCorr = imtransform(lineImg, tform, 'XData', [1 sizeLine(2)], 'YData', [1 sizeLine(1)]);            
+%             %figure(11), imshow(lineImgCorr); title('Corrected lineImgCorr');
+%                                        
+%             % (*Optional*) OCR by Individual Characters
+% %                 lineRegLabels = bwlabel(lineImg,8);  %label the regions
+% %                 %figure(5), imagesc(lineRegLabels);             
+% % 
+% %                 % '=' will have two regions that have almost same x-centroid
+% %                 minCentXSeparation = 20;  % Assume characters are separated by at least this much
+% %                 % Use bitMask to eliminate double counting x-centroid of '='
+% %                 regMask  = logical([ (CentX(regAll(2:end)) - CentX(regAll(1:end-1)) > minCentXSeparation) 1]);  %bitMask 
+% %                 % Get x-centroid of all characters
+% %                 charX = [CentX( regAll(regMask) ) sizeImg(2)];
+% % 
+% %                 % Set boundary as mean of x-centroid of neighbouring characters
+% %                 boundaryCharX      = zeros(1,length(charX)+1);
+% %                 boundaryCharX(1)   = 1;
+% %                 boundaryCharX(end) = sizeImg(2);
+% %                 for ii = 1:length(charX)-1
+% %                     boundaryCharX(ii+1) = round(mean([charX(ii), charX(ii+1)]));
+% % 
+% %                     charImg = lineImg(:, boundaryCharX(ii):boundaryCharX(ii+1));
+% %                     %figure, imshow(charImg);
+% %                     imwrite(charImg, 'charImg.jpg');
+% %                     [status,result] = system('tesseract C:\wamp\www\upload\charImg.jpg C:\wamp\www\upload\TessOutput -psm 10 alpha_number_math');
+% %                     ocrLine = textread('TessOutput.txt', '%s', 'delimiter', ',')
+% %                 end
+%             lineImgCorr = lineImg;
+%             figure(6), imshow(lineImgCorr);
 % 
-%                 % Set boundary as mean of x-centroid of neighbouring characters
-%                 boundaryCharX      = zeros(1,length(charX)+1);
-%                 boundaryCharX(1)   = 1;
-%                 boundaryCharX(end) = sizeImg(2);
-%                 for ii = 1:length(charX)-1
-%                     boundaryCharX(ii+1) = round(mean([charX(ii), charX(ii+1)]));
-% 
-%                     charImg = lineImg(:, boundaryCharX(ii):boundaryCharX(ii+1));
-%                     %figure, imshow(charImg);
-%                     imwrite(charImg, 'charImg.jpg');
-%                     [status,result] = system('tesseract C:\wamp\www\upload\charImg.jpg C:\wamp\www\upload\TessOutput -psm 10 alpha_number_math');
-%                     ocrLine = textread('TessOutput.txt', '%s', 'delimiter', ',')
-%                 end
-            lineImgCorr = lineImg;
-            figure(6), imshow(lineImgCorr);
-
-%             imwrite(lineImgCorr, 'C:\wamp\www\upload\lineImgCorr.jpg');
-%             [status,result] = system('C:\wamp\www\Tesseract-OCR\tesseract C:\wamp\www\upload\lineImgCorr.jpg C:\wamp\www\upload\tessLineImg -psm 7 alpha_number_math');            
-% 
-%             Write output to File
-%             system('type C:\wamp\www\upload\tessLineImg.txt >> C:\wamp\www\upload\TessOutput.txt');
-%             system('echo. >> C:\wamp\www\upload\TessOutput.txt');
+% %             imwrite(lineImgCorr, 'C:\wamp\www\upload\lineImgCorr.jpg');
+% %             [status,result] = system('C:\wamp\www\Tesseract-OCR\tesseract C:\wamp\www\upload\lineImgCorr.jpg C:\wamp\www\upload\tessLineImg -psm 7 alpha_number_math');            
+% % 
+% %             Write output to File
+% %             system('type C:\wamp\www\upload\tessLineImg.txt >> C:\wamp\www\upload\TessOutput.txt');
+% %             system('echo. >> C:\wamp\www\upload\TessOutput.txt');
             
     end      
