@@ -1,0 +1,23 @@
+You are not allowed to use any compiler flags that relax IEEE mu
+
+:4
+
+(EL -Ffas!—matl1).
+You may not use iCC’s ~opt-marmul flag.
+4. You are not allowed to use any linear-algebra libraries (LAPACKJ
+
+ETTING STARTED
+
+>u will be coding your assignment under Linux. We will be grading your as
+Jster of 2.33 GHz Intel Xeon E5345‘: (32kB L1 cnche, 4MB L2 cache). You
+
+mpiler we provide on the cluster.
+
+soon as possible, ssh into cytIades.stanford.edu to ensure that your a
+med accounts for every student in the class. Your usarnnme and paw
+
+Net account, and your Leland AF5 directory should be your home din
+"‘ ‘N-‘M13: cvcledes is not directly aacanlbleafl
+
+Lu
+

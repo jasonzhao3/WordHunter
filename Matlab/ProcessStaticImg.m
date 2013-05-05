@@ -6,15 +6,36 @@ addpath(genpath('..\vlfeat\vlfeat-0.9.16'));
 addpath(genpath('..\GML_RANSAC_Matlab_Toolbox_0.2'));
 
 %Read image file
-img = imread('post_office_30.jpg');
+img = imread('.\img\no_skew_small.jpg');
 img = uint8(rgb2gray(img));
 sizeImg = size(img);
+figure(1);imshow(img);
 
-imshow(img);
+%img enhancement
+img = adapthisteq(img, 'NumTiles', [5 5], 'ClipLimit', 0.005);
+figure(2);imshow(img);
+imwrite(img, '.\img\img_enhanced.png');
+
+% % Perform global thresholding with Otsu's method
+% level = graythresh(img);
+% img = im2bw(img, level);
+% 
+% figure(3);imshow(img);
+% imwrite(img, '.\img\img_bw.png');
+
+
+% 
+% %deskew part
+% angleRotate=getHoughAngle(img);
+% img_rotate=imcomplement(imrotate(imcomplement(img),angleRotate,'crop'));
+% imshow(img_rotate);
+% imwrite(img_rotate, '.\img\img_rotate.png');
+
+
 % (1) VL_MSER
     try
         % Compute region seeds and elliptical frames
-            [reg fr] = vl_mser(img, 'MinDiversity', 0.7, 'MaxVariation', 0.4, 'Delta', 15, 'MaxArea', 0.1, 'MinArea', (50/(sizeImg(1)*sizeImg(2))) );
+            [reg fr] = vl_mser(img, 'MinDiversity', 0.2, 'MaxVariation', 0.7, 'Delta', 15, 'MaxArea', 0.1, 'MinArea', (5/(sizeImg(1)*sizeImg(2))) );
    
         % Calculate regions    
             MSERimg = zeros(sizeImg);
@@ -26,64 +47,64 @@ imshow(img);
                 s = vl_erfill(img,x);  %Return pixels belonging to region seed x
                 MSERimg(s) = MSERimg(s) + 1;            %Number of overlapping extremal regions                
             end
-            figure(3), imshow(MSERimg);
-%             imwrite(MSERimg,'C:\wamp\www\libSVM\MSERimg.jpg');
-
-    % (2) Region Props to Segment out Lines        
-        regLabels = bwlabel(MSERimg,8);  %label the regions
-        figure(4), imagesc(regLabels);
-
-        regProp   = regionprops(regLabels, 'BoundingBox', 'Centroid', 'Area', 'Solidity');
-
-        %(2a) Find Centroid X and Centroid Y
-            CentX = zeros(1,length(regProp));
-            CentY = zeros(1,length(regProp));
-            TopY  = zeros(1,length(regProp));
-            BotY  = zeros(1,length(regProp));
-            for ri = 1:length(regProp)
-                Centroid  = regProp(ri).Centroid;
-                CentX(ri) = Centroid(1);
-                CentY(ri) = Centroid(2);
-                BdBox     = regProp(ri).BoundingBox;
-                TopY (ri) = BdBox(2);
-                BotY (ri) = BdBox(2) + BdBox(4);     %Y for bottom of region            
-            end
-
-        %(2b) Figure out the number of lines using Histogram
-            numBins = 20;
-            bins = (sizeImg(1)/(numBins*2)):(sizeImg(1)/numBins):sizeImg(1);
-            [imgHist binsHist] = hist(CentY, bins);
-%             figure(5); hist(CentY, bins);
-
-            line_ind = 1;      % line index
-            lineY    = 0;
-            peakHist = 0;
-            for ii = 1:numBins
-                if (imgHist(ii) > peakHist)          % New peak fond
-                    lineY(line_ind) = binsHist(ii);  % Update line Centroid Y
-                    peakHist        = imgHist(ii);   % Store current peak as new max
-                end
-                if (peakHist > 0) && (imgHist(ii) == 0)  % End of line
-                    line_ind = line_ind + 1;             %   Increment line index
-                    peakHist = 0;                        %   Reset max
-                end
-            end
-
-        %(2c) Calculate boundary of lines based on mean of centroid Y in histogram       
-            boundaryLineY      = zeros(1,length(lineY)+1);
-            boundaryLineY(1)   = 1;          %Top of first line is row 1
-            boundaryLineY(end) = sizeImg(1); %Bottom of last line is Y extent of image
-
-            % Set boundary as mean of Centroid Y of neighbouring lines
-            for ii = 2:length(lineY)
-                boundaryLineY(ii) = round(mean([lineY(ii-1), lineY(ii)]));
-            end
+            figure(4), imshow(MSERimg);
+           imwrite(MSERimg, '.\img\img_MSER.png');
+% 
+%     % (2) Region Props to Segment out Lines        
+%         regLabels = bwlabel(MSERimg,8);  %label the regions
+%         figure(4), imagesc(regLabels);
+% 
+%         regProp   = regionprops(regLabels, 'BoundingBox', 'Centroid', 'Area', 'Solidity');
+% 
+%         %(2a) Find Centroid X and Centroid Y
+%             CentX = zeros(1,length(regProp));
+%             CentY = zeros(1,length(regProp));
+%             TopY  = zeros(1,length(regProp));
+%             BotY  = zeros(1,length(regProp));
+%             for ri = 1:length(regProp)
+%                 Centroid  = regProp(ri).Centroid;
+%                 CentX(ri) = Centroid(1);
+%                 CentY(ri) = Centroid(2);
+%                 BdBox     = regProp(ri).BoundingBox;
+%                 TopY (ri) = BdBox(2);
+%                 BotY (ri) = BdBox(2) + BdBox(4);     %Y for bottom of region            
+%             end
+% 
+%         %(2b) Figure out the number of lines using Histogram
+%             numBins = 20;
+%             bins = (sizeImg(1)/(numBins*2)):(sizeImg(1)/numBins):sizeImg(1);
+%             [imgHist binsHist] = hist(CentY, bins);
+% %             figure(5); hist(CentY, bins);
+% 
+%             line_ind = 1;      % line index
+%             lineY    = 0;
+%             peakHist = 0;
+%             for ii = 1:numBins
+%                 if (imgHist(ii) > peakHist)          % New peak fond
+%                     lineY(line_ind) = binsHist(ii);  % Update line Centroid Y
+%                     peakHist        = imgHist(ii);   % Store current peak as new max
+%                 end
+%                 if (peakHist > 0) && (imgHist(ii) == 0)  % End of line
+%                     line_ind = line_ind + 1;             %   Increment line index
+%                     peakHist = 0;                        %   Reset max
+%                 end
+%             end
+% 
+%         %(2c) Calculate boundary of lines based on mean of centroid Y in histogram       
+%             boundaryLineY      = zeros(1,length(lineY)+1);
+%             boundaryLineY(1)   = 1;          %Top of first line is row 1
+%             boundaryLineY(end) = sizeImg(1); %Bottom of last line is Y extent of image
+% 
+%             % Set boundary as mean of Centroid Y of neighbouring lines
+%             for ii = 2:length(lineY)
+%                 boundaryLineY(ii) = round(mean([lineY(ii-1), lineY(ii)]));
+%             end
     catch e
         disp('ERROR: Bad image.  Please take another image!');
         disp(getReport(e,'extended'));
     end
-    
-    
+%     
+%     
     
 %     %% (3) Segment out Lines, correct with RANSAC + Affine Transform
 % %     system('del C:\wamp\www\upload\TessOutput.txt');
@@ -169,4 +190,4 @@ imshow(img);
 % %             system('type C:\wamp\www\upload\tessLineImg.txt >> C:\wamp\www\upload\TessOutput.txt');
 % %             system('echo. >> C:\wamp\www\upload\TessOutput.txt');
             
-    end      
+%     end      
