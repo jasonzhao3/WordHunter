@@ -24,9 +24,18 @@ img = imerode(img,se);
 figure(3); imshow(img);
 
 %img segementation into words
+% Disk I/O is too slow here 
 bbArray = word_segment(img);
 for i = 1 : size(bbArray, 1)
     rectangle('Position',bbArray(i,:),'Linewidth',2,'EdgeColor','red');
+    imgPathStr = strcat('.\process_img\word_', num2str(i), '.png');
+    imwrite(img(bbArray(i,2):bbArray(i,2) + bbArray(i,4), ...
+            bbArray(i,1):bbArray(i,1) + bbArray(i,3)), imgPathStr);
+
+    tessPath = strcat('tesseract  D:\_Stanford\Course_Information\EE368\Project\Matlab\process_img\word_', ...
+        num2str(i), '.png  D:\_Stanford\Course_Information\EE368\Project\Matlab\process_img\out -psm 8');
+    system(tessPath);
+   
 end
 
 
