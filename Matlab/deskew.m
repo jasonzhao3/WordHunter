@@ -1,7 +1,7 @@
 %bad version of binarization
 image = imread('./img/skewed_text.jpg');
-%image = imread('./img/skew_30d.jpg');
-%image = imread('./img/img_rotate.png');
+% image = imread('./img/skew_30d.jpg');
+% image = imread('./img/img_rotate.png');
 if(size(image,3)==3)
     image = rgb2gray(image);
 end;
