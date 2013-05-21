@@ -128,7 +128,7 @@ static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth)
   //two dx is because when the bounding box becomes a rectangule, the original dx will not work anymore
   //two rectangles intersect
   if ((rect1 & rect2).area() != 0 ) return true;
-  if ((dy1 < 0.25 * cHeight || dy2 < 0.4 * cHeight) && (dx1 < 0.45 * cWidth || dx2 < 0.45 *cWidth)) return true;
+  if ((dy1 < 0.25 * cHeight || dy2 < 0.35 * cHeight) && (dx1 < 0.45 * cWidth || dx2 < 0.45 *cWidth)) return true;
   else return false;
 }
 
