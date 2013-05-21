@@ -31,7 +31,7 @@ struct less_second {
 static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth);
 static void findCharSize(vector<Rect> & boundRect, int & cHeight,int & cWidth);
 static void mergeBoundRect(vector<Rect> & boundRect,int & index1, int & index2);
-
+static void clearNullRect(vector<Rect> & boundRect);
 
 int main(int argc, char** argv)
 {
@@ -78,10 +78,14 @@ int main(int argc, char** argv)
   // merge the neighbour rectangles
   for (int i = 0; i < boundRect.size(); i++) { //how to eliminate the nested for-loop?
     for (int j = i + 1; j < boundRect.size(); j++) {
-      if (isNeighbour(boundRect[i], boundRect[j], cHeight, cWidth)) 
+      if (isNeighbour(boundRect[i], boundRect[j], cHeight, cWidth)) {
 	mergeBoundRect(boundRect, i, j);
+      }
     }
   }
+  // clear already merged rectangles
+  clearNullRect(boundRect);
+
   int rectNum = boundRect.size();
   for (int i = 0; i < boundRect.size(); i++) {
       rectangle(outputImage, boundRect[i], color, 1, 8, 0);
@@ -113,6 +117,8 @@ int main(int argc, char** argv)
 
 
 static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth) {
+  if (rect1.area() == 0 || rect2.area() == 0) return false;
+
   float dy = abs(rect1.tl().y - rect2.tl().y); // maybe problematic with x and y
   float dx = abs(rect1.tl().x - rect2.tl().x);
 
@@ -142,24 +148,39 @@ static void findCharSize(vector<Rect> & boundRect, int & cHeight,int & cWidth) {
 
 
 static void mergeBoundRect(vector<Rect> & boundRect,int & index1, int & index2) {
-  int x1 = boundRect[index1].tl().x;
-  int x2 = boundRect[index2].tl().x; 
-  int y1 = boundRect[index1].tl().y;
-  int y2 = boundRect[index2].tl().y;
+  // int x1 = boundRect[index1].tl().x;
+  // int x2 = boundRect[index2].tl().x; 
+  // int y1 = boundRect[index1].tl().y;
+  // int y2 = boundRect[index2].tl().y;
 
-  int xTl = x1 > x2 ? x2 : x1;
-  int yTl =  y1 > y2 ? y2 : y1; //y is reversed coordinate?
+  // int xTl = x1 > x2 ? x2 : x1;
+  // int yTl =  y1 > y2 ? y2 : y1; //y is reversed coordinate?
   
-  x1 = boundRect[index1].br().x;
-  x2 = boundRect[index2].br().x;
-  y1 = boundRect[index1].br().y;
-  y2 = boundRect[index2].br().y;
+  // x1 = boundRect[index1].br().x;
+  // x2 = boundRect[index2].br().x;
+  // y1 = boundRect[index1].br().y;
+  // y2 = boundRect[index2].br().y;
   
-  int xBr = x1 > x2 ? x1 : x2;
-  int yBr = y1 > y2 ? y1 : y2;
-  // do we need to handle the memory issue to free the memory?
+  // int xBr = x1 > x2 ? x1 : x2;
+  // int yBr = y1 > y2 ? y1 : y2;
+  // // do we need to handle the memory issue to free the memory?
+ 
+  Rect newRect = boundRect[index1] | boundRect[index2];
+  //boundRect.erase(boundRect.begin() + index1);
+  //  boundRect.erase(boundRect.begin() + index2 - 1);
+  //  boundRect.push_back(Rect(Point(xTl, yTl), Point(xBr, yBr)));
+  Rect nullRect = Rect(Point(0,0), Point(0,0));
+  boundRect[index1] = nullRect;
+  boundRect[index2] = nullRect;
+  boundRect.push_back(newRect);
+}
 
-  boundRect.erase(boundRect.begin() + index1);
-  boundRect.erase(boundRect.begin() + index2);
-  boundRect.push_back(Rect(Point(xTl, yTl), Point(xBr, yBr)));
+
+static void clearNullRect(vector<Rect> & boundRect){
+  for (int i = 0; i < boundRect.size(); i++) {
+    if (boundRect[i].area() == 0) {
+      boundRect.erase(boundRect.begin() + i);
+      --i;
+    }
+  }
 }
