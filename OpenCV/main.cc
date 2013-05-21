@@ -52,27 +52,32 @@ int main(int argc, char** argv)
   // gray2bw
   adaptiveThreshold(grayImage,bwImage, 255, ADAPTIVE_THRESH_MEAN_C,\
 		    THRESH_BINARY_INV, blkSize, 10);
-  
+
+
   //add bounding box
   cvtColor(bwImage, outputImage, CV_GRAY2RGB, 0);
   vector<vector<Point> > contours;
   findContours(bwImage, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
 
+  Mat outputImage2 = outputImage.clone();
   int numContours = contours.size();
   vector<Rect> boundRect(numContours);
   Scalar color = Scalar(0,0,255);
 
+
   for (int i = 0; i < numContours; i++) {
     boundRect[i] = boundingRect(contours[i]);
-    //    rectangle(outputImage, boundRect[i], color, 1, 8, 0);
+    rectangle(outputImage2, boundRect[i], color, 1, 8, 0);
   }
+   imwrite("output_image2.jpg", outputImage2);
+
 
   // estimate the width and height of each character
   int cHeight, cWidth;
   findCharSize(boundRect, cHeight, cWidth);
   // merge the neighbour rectangles
-  for (int i = 0; i < numContours; i++) { //how to eliminate the nested for-loop?
-    for (int j = i + 1; j < numContours; j++) {
+  for (int i = 0; i < boundRect.size(); i++) { //how to eliminate the nested for-loop?
+    for (int j = i + 1; j < boundRect.size(); j++) {
       if (isNeighbour(boundRect[i], boundRect[j], cHeight, cWidth)) 
 	mergeBoundRect(boundRect, i, j);
     }
@@ -111,7 +116,7 @@ static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth)
   float dy = abs(rect1.tl().y - rect2.tl().y); // maybe problematic with x and y
   float dx = abs(rect1.tl().x - rect2.tl().x);
 
-  if (dy < 0.5 * cHeight || dx < cWidth) return true;
+  if (dy < 0.3 * cHeight && dx < 1.1 * cWidth) return true;
   else return false;
 }
 
