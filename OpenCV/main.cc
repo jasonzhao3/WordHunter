@@ -121,13 +121,14 @@ int main(int argc, char** argv)
 static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth) {
   if (rect1.area() == 0 || rect2.area() == 0) return false;
 
-  float dy = abs(rect1.tl().y - rect2.tl().y); // maybe problematic with x and y
+  float dy1 = abs(rect1.tl().y - rect2.tl().y); //i and j's dot
+  float dy2 = abs(rect1.br().y - rect2.br().y); //"al"'s problem
   float dx1 = abs(rect1.tl().x - rect2.br().x); //if rect2 is in front of rect1
   float dx2 = abs(rect1.br().x - rect2.tl().x);
   //two dx is because when the bounding box becomes a rectangule, the original dx will not work anymore
   //two rectangles intersect
   if ((rect1 & rect2).area() != 0 ) return true;
-  if ((dy < 0.25 * cHeight) && (dx1 < 0.2 * cWidth || dx2 < 0.2 *cWidth)) return true;
+  if ((dy1 < 0.25 * cHeight || dy2 < 0.4 * cHeight) && (dx1 < 0.45 * cWidth || dx2 < 0.45 *cWidth)) return true;
   else return false;
 }
 
