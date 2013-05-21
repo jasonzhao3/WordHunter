@@ -43,7 +43,7 @@ int main(int argc, char** argv)
     return -1;
   }
   
-  //  namedWindow("Display_Image", CV_WINDOW_AUTOSIZE);
+  // namedWindow("Display_Image", CV_WINDOW_AUTOSIZE);
   // imshow("Display_Image", image);
   // rgb2gray
   cvtColor(image, grayImage, CV_RGB2GRAY);
@@ -69,7 +69,8 @@ int main(int argc, char** argv)
     boundRect[i] = boundingRect(contours[i]);
     rectangle(outputImage2, boundRect[i], color, 1, 8, 0);
   }
-   imwrite("output_image2.jpg", outputImage2);
+  imwrite("output_image0.jpg", outputImage);
+  imwrite("output_image2.jpg", outputImage2);
 
 
   // estimate the width and height of each character
@@ -77,10 +78,11 @@ int main(int argc, char** argv)
   findCharSize(boundRect, cHeight, cWidth);
   // merge the neighbour rectangles
   for (int i = 0; i < boundRect.size(); i++) { //how to eliminate the nested for-loop?
-    for (int j = i + 1; j < boundRect.size(); j++) {
+    for (int j = i+1; j < boundRect.size(); j++) {
       if (isNeighbour(boundRect[i], boundRect[j], cHeight, cWidth)) {
-	mergeBoundRect(boundRect, i, j);
-      }
+	       mergeBoundRect(boundRect, i, j);
+         break;
+      } 
     }
   }
   // clear already merged rectangles
@@ -120,9 +122,12 @@ static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth)
   if (rect1.area() == 0 || rect2.area() == 0) return false;
 
   float dy = abs(rect1.tl().y - rect2.tl().y); // maybe problematic with x and y
-  float dx = abs(rect1.tl().x - rect2.tl().x);
-
-  if (dy < 0.3 * cHeight && dx < 1.1 * cWidth) return true;
+  float dx1 = abs(rect1.tl().x - rect2.br().x); //if rect2 is in front of rect1
+  float dx2 = abs(rect1.br().x - rect2.tl().x);
+  //two dx is because when the bounding box becomes a rectangule, the original dx will not work anymore
+  //two rectangles intersect
+  if ((rect1 & rect2).area() != 0 ) return true;
+  if ((dy < 0.25 * cHeight) && (dx1 < 0.2 * cWidth || dx2 < 0.2 *cWidth)) return true;
   else return false;
 }
 
@@ -142,8 +147,10 @@ static void findCharSize(vector<Rect> & boundRect, int & cHeight,int & cWidth) {
     areaAvg += areaArray[i].first;
   }
   areaAvg = areaAvg / 10.0;
-  cHeight = sqrt(areaAvg) * 1.3;
-  cWidth = sqrt(areaAvg) * 0.8;
+  cHeight = sqrt(areaAvg) * 1.1;
+  cWidth = sqrt(areaAvg) * 0.75;
+  cout << "character width is " << cWidth << endl;
+  cout << "character height is " << cHeight << endl;
 }
 
 
