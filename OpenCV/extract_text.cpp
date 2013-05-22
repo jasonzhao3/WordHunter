@@ -37,6 +37,8 @@ static void clearNullRect(vector<Rect> & boundRect, float & cArea);
 static string textRecognition(Mat & txtImage);
 static void writeFile(string & sResult);
 static Rect addPadding(Rect & rectBox, int & cHeight, int & cWidth, int & iHeight, int &iWidth);
+static Mat addPadding(Mat & wordWindow);
+
 
 int main(int argc, char** argv)
 {
@@ -101,12 +103,14 @@ int main(int argc, char** argv)
   int iWidth = outputBwImage.size().width;
 
   for (int i = 0; i < rectNum; i++) {
-      Rect wordBound = addPadding(boundRect[i], cHeight, cWidth, iHeight, iWidth);
-      Mat wordWindow(outputBwImage, wordBound);
-      // imwrite("output_word_" + to_string(i) + ".jpg", wordWindow);
-      sResult = textRecognition(wordWindow) + "\n";
+      //Rect wordBound = addPadding(boundRect[i], cHeight, cWidth, iHeight, iWidth);
+      // Mat wordWindow(outputBwImage, wordBound);
+      Mat wordWindow(outputBwImage, boundRect[i]);
+      Mat wordWindowWithPadding = addPadding(wordWindow);
+    //  imwrite("output_word_" + to_string(i) + ".jpg", wordWindowWithPadding);
+      sResult = textRecognition(wordWindowWithPadding) + "\n";
       writeFile(sResult);
-      rectangle(outputImage, wordBound, color, 1, 8, 0);
+      rectangle(outputImage, boundRect[i], color, 1, 8, 0);
   }
 					
   imwrite("gray_image.jpg", grayImage);
@@ -211,6 +215,22 @@ static Rect addPadding(Rect & rectBox, int & cHeight, int & cWidth, int & iHeigh
     return wordBound;
 }
 
+
+static Mat addPadding(Mat & wordWindow) {
+  Mat wordWindowWithPadding;
+  int top, bottom, left, right;
+  top = (int) wordWindow.rows;
+  bottom = (int) wordWindow.rows;
+  left = (int) wordWindow.cols;
+  right = (int) wordWindow.cols;
+  
+  // cout << "top is " << top << endl;
+  // cout << "left is " << top << endl;
+  
+  copyMakeBorder(wordWindow, wordWindowWithPadding, \
+    top, bottom, left, right, BORDER_CONSTANT, Scalar(0, 0, 0));
+  return wordWindowWithPadding;
+}
 
 
 // int main( int argc, char* argv[])
