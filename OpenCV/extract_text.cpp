@@ -21,6 +21,14 @@ struct less_second {
   }
 };
 
+template <class T>
+static inline string to_string (const T& t)
+{
+  std::stringstream ss;
+  ss << t;
+  return ss.str();
+}
+
 
 static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth);
 static void findCharSize(vector<Rect> & boundRect, int & cHeight,int & cWidth, float & cArea);
@@ -28,7 +36,7 @@ static void mergeBoundRect(vector<Rect> & boundRect,int & index1, int & index2);
 static void clearNullRect(vector<Rect> & boundRect, float & cArea);
 static string textRecognition(Mat & txtImage);
 static void writeFile(string & sResult);
-
+static Rect addPadding(Rect & rectBox, int & cHeight, int & cWidth, int & iHeight, int &iWidth);
 
 int main(int argc, char** argv)
 {
@@ -49,20 +57,18 @@ int main(int argc, char** argv)
   // gray2bw
   adaptiveThreshold(grayImage,bwImage, 255, ADAPTIVE_THRESH_MEAN_C,\
 		    THRESH_BINARY_INV, blkSize, 10);
-
-
+  
+  Mat outputBwImage = bwImage.clone();
   //add bounding box
   cvtColor(bwImage, outputImage, CV_GRAY2RGB, 0);
   vector<vector<Point> > contours;
   findContours(bwImage, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
-
-  Mat outputBwImage = grayImage.clone();
+  
   Mat outputImage2 = outputImage.clone();
+
   int numContours = contours.size();
   vector<Rect> boundRect(numContours);
   Scalar color = Scalar(0,0,255);
-
-
   for (int i = 0; i < numContours; i++) {
     boundRect[i] = boundingRect(contours[i]);
     rectangle(outputImage2, boundRect[i], color, 1, 8, 0);
@@ -89,16 +95,18 @@ int main(int argc, char** argv)
   // clear already merged rectangles, and too large and too-small regions
   clearNullRect(boundRect, cArea);
 
-  int rectNum = boundRect.size();
-  
   string sResult;
-  string str[4] = {"1", "2", "3", "4"};
+  int rectNum = boundRect.size();
+  int iHeight = outputBwImage.size().height;
+  int iWidth = outputBwImage.size().width;
+
   for (int i = 0; i < rectNum; i++) {
-      Mat wordWindow(outputBwImage, boundRect[i]);
-      //imwrite("output_word_" + str[i] + ".jpg", wordWindow);
+      Rect wordBound = addPadding(boundRect[i], cHeight, cWidth, iHeight, iWidth);
+      Mat wordWindow(outputBwImage, wordBound);
+      // imwrite("output_word_" + to_string(i) + ".jpg", wordWindow);
       sResult = textRecognition(wordWindow) + "\n";
       writeFile(sResult);
-      rectangle(outputImage, boundRect[i], color, 1, 8, 0);
+      rectangle(outputImage, wordBound, color, 1, 8, 0);
   }
 					
   imwrite("gray_image.jpg", grayImage);
@@ -186,7 +194,22 @@ static void writeFile(string & sResult) {
 	myFile.close();
 }
 
+static Rect addPadding(Rect & rectBox, int & cHeight, int & cWidth, int & iHeight, int &iWidth) {
+    Rect wordBound(rectBox);
+    wordBound.x -= 0.3 * cWidth;
+    wordBound.y -= 0.3 * cHeight;
+    wordBound.width += cWidth;
+    wordBound.height += 0.5 * cHeight;
+// is there a better way to do bound checking???
+    wordBound.x = wordBound.x > 0 ? wordBound.x : 0;
+    wordBound.y = wordBound.y > 0 ? wordBound.y : 0;
+    if (wordBound.x + wordBound.width > iWidth) 
+       wordBound.width = iWidth - wordBound.x;
+    if (wordBound.y + wordBound.height > iHeight)
+      wordBound.height = iHeight -wordBound.y;
 
+    return wordBound;
+}
 
 
 

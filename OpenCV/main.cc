@@ -92,21 +92,7 @@ int main(int argc, char** argv)
   for (int i = 0; i < boundRect.size(); i++) {
       rectangle(outputImage, boundRect[i], color, 1, 8, 0);
   }
-  // mser
-  // Size s = image.size();
-  // mserImage = Mat::zeros(s, CV_32F);
-  // vector<vector<Point> > contours;
-  // MSER(15, 5, 100000, 200, 0.05)(equalImage, contours);
-  // int x = contours.size();
-  // cout <<"the value of x is " <<  x <<pppppp endl;
-  // for (int i = 0; i < contours.size(); i++) {
-  //   const vector<Point> &r = contours[i];
-  //   for (int j = 0; j < r.size(); j++) {
-  //     Point pt = r[j];
-  //     mserImage.at<double>(pt) = 255;
-  //   }
-  // }
-					
+
   imwrite("gray_image.jpg", grayImage);
   imwrite("equal_image.jpg", equalImage);
   imwrite("bw_image.jpg", bwImage);
