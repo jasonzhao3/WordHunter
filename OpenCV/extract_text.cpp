@@ -38,18 +38,21 @@ static string textRecognition(Mat & txtImage);
 static void writeFile(string & sResult);
 static Rect addPadding(Rect & rectBox, int & cHeight, int & cWidth, int & iHeight, int &iWidth);
 static Mat addPadding(Mat & wordWindow);
+static bool isMatch(string & sResult, string & wordToSearch);
 
 
 int main(int argc, char** argv)
 {
-  Mat image, grayImage, bwImage, equalImage,  mserImage, outputImage;
-  image = imread (argv[1], 1);
-  int blkSize = atoi(argv[2]);
-  if (argc != 3 || !image.data) {
-    printf("Incorrect input. Please enter: executable + imageFileName + blockSize \n");
+  Mat image, grayImage, bwImage, equalImage,  mserImage, outputImage, copyImage;
+  if (argc != 3) {
+    printf("Incorrect input. Please enter: executable + imageFileName + wordToSearch \n");
     return -1;
   }
   
+  image = imread (argv[1], 1);
+  copyImage = image.clone();
+  string wordToSearch = argv[2];
+  int blkSize = 25;
   // namedWindow("Display_Image", CV_WINDOW_AUTOSIZE);
   // imshow("Display_Image", image);
   // rgb2gray
@@ -107,13 +110,23 @@ int main(int argc, char** argv)
       // Mat wordWindow(outputBwImage, wordBound);
       Mat wordWindow(outputBwImage, boundRect[i]);
       Mat wordWindowWithPadding = addPadding(wordWindow);
-    //  imwrite("output_word_" + to_string(i) + ".jpg", wordWindowWithPadding);
-      sResult = textRecognition(wordWindowWithPadding) + "\n";
+      //  imwrite("output_word_" + to_string(i) + ".jpg", wordWindowWithPadding);
+      sResult = textRecognition(wordWindowWithPadding);
+
+      //only circle out the mached words
+     
+      
+      if (isMatch(sResult, wordToSearch)) {d
+         rectangle(copyImage, boundRect[i], color, 1, 8, 0);
+      }
+
+      // rectangle(outputImage, boundRect[i], color, 1, 8, 0);
       writeFile(sResult);
       rectangle(outputImage, boundRect[i], color, 1, 8, 0);
   }
 					
   imwrite("gray_image.jpg", grayImage);
+  imwrite("copy_image.jpg", copyImage);
   imwrite("equal_image.jpg", equalImage);
   imwrite("bw_image.jpg", bwImage);
   imwrite("ouptut_image.jpg", outputImage);
@@ -233,34 +246,11 @@ static Mat addPadding(Mat & wordWindow) {
 }
 
 
-// int main( int argc, char* argv[])
-// {
-// 	if ( argc != 3)
-// 	{
-// 		cout << "Usage: extract_text <input_image> <output_text_file>" << endl;
-// 		return -1;
-// 	}
-
-// 	string		sInputImage = argv[1];
-// 	string		sOutputFile = argv[2];
-
-// 	// Load the input image
-// 	IplImage* pInputImage = cvLoadImage( sInputImage.c_str(), CV_LOAD_IMAGE_GRAYSCALE);
-	
-// 	// Perform the recognition
-// 	TextReader tReader( TESS_DATA_CONFIG);  
-// 	string 	sResults = tReader.RecognizePatch( pInputImage);
-
-// 	// Output results
-// 	ofstream hFile( sOutputFile.c_str());
-// 	hFile << sResults;
-// 	hFile.close();
-
-// 	// Clean up
-// 	cvReleaseImage( &pInputImage);
-
-// 	return 0;
-// }
-
+static bool isMatch(string &sResult, string &wordToSearch) {
+  //may need change to use edit distance
+  if (wordToSearch.compare(sResult) == 0) 
+    return true;
+  else return false;
+}
 
 
