@@ -39,7 +39,7 @@ static void writeFile(string & sResult);
 static Rect addPadding(Rect & rectBox, int & cHeight, int & cWidth, int & iHeight, int &iWidth);
 static Mat addPadding(Mat & wordWindow);
 static bool isMatch(string & sResult, string & wordToSearch);
-
+static bool withinLengthRange(Rect & rectBox, int & widthLimit);
 
 int main(int argc, char** argv)
 {
@@ -52,6 +52,7 @@ int main(int argc, char** argv)
   image = imread (argv[1], 1);
   copyImage = image.clone();
   string wordToSearch = argv[2];
+  int numLetters = wordToSearch.length();
   int blkSize = 25;
   // namedWindow("Display_Image", CV_WINDOW_AUTOSIZE);
   // imshow("Display_Image", image);
@@ -83,9 +84,10 @@ int main(int argc, char** argv)
 
 
   // estimate the width and height of each character
-  int cHeight, cWidth;
+  int cHeight, cWidth, widthLimit;
   float cArea;
   findCharSize(boundRect, cHeight, cWidth, cArea);
+  widthLimit = numLetters * cWidth;
 
 
   // merge the neighbour rectangles
@@ -108,20 +110,22 @@ int main(int argc, char** argv)
   for (int i = 0; i < rectNum; i++) {
       //Rect wordBound = addPadding(boundRect[i], cHeight, cWidth, iHeight, iWidth);
       // Mat wordWindow(outputBwImage, wordBound);
-      Mat wordWindow(outputBwImage, boundRect[i]);
-      Mat wordWindowWithPadding = addPadding(wordWindow);
-      //  imwrite("output_word_" + to_string(i) + ".jpg", wordWindowWithPadding);
-      sResult = textRecognition(wordWindowWithPadding);
+      if (withinLengthRange(boundRect[i], widthLimit)) {
+        Mat wordWindow(outputBwImage, boundRect[i]);
+        Mat wordWindowWithPadding = addPadding(wordWindow);
+        //  imwrite("output_word_" + to_string(i) + ".jpg", wordWindowWithPadding);
+        sResult = textRecognition(wordWindowWithPadding);
 
-      //only circle out the mached words
-     
-      
-      if (isMatch(sResult, wordToSearch)) {d
-         rectangle(copyImage, boundRect[i], color, 1, 8, 0);
+        //only circle out the mached words
+       
+        
+        if (isMatch(sResult, wordToSearch)) {
+           rectangle(copyImage, boundRect[i], color, 1, 8, 0);
+        }
       }
 
       // rectangle(outputImage, boundRect[i], color, 1, 8, 0);
-      writeFile(sResult);
+      //writeFile(sResult);
       rectangle(outputImage, boundRect[i], color, 1, 8, 0);
   }
 					
@@ -170,8 +174,8 @@ static void findCharSize(vector<Rect> & boundRect, int & cHeight,int & cWidth, f
   cHeight = sqrt(areaAvg) * 1.1;
   cWidth = sqrt(areaAvg) * 0.75;
   cArea = areaAvg;
-  cout << "character width is " << cWidth << endl;
-  cout << "character height is " << cHeight << endl;
+ // cout << "character width is " << cWidth << endl;
+ // cout << "character height is " << cHeight << endl;
 }
 
 
@@ -253,4 +257,10 @@ static bool isMatch(string &sResult, string &wordToSearch) {
   else return false;
 }
 
-
+static bool withinLengthRange(Rect & rectBox, int & widthLimit) {
+  float width = rectBox.width;
+  if (width > 0.8 * widthLimit && width < 1.2 * widthLimit) 
+    return true;
+  else 
+    return false;
+}
