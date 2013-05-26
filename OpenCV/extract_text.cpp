@@ -12,7 +12,7 @@ using namespace std;
 #define TESS_DATA_CONFIG "alphanumeric"
 // the  name corresponds to the configs files in the tessdata/config 
 
-
+//comparator used for rectangle comparation
 template <typename T1, typename T2>
 struct less_second {
   typedef pair<T1, T2> type;
@@ -21,6 +21,7 @@ struct less_second {
   }
 };
 
+//change number to string
 template <class T>
 static inline string to_string (const T& t)
 {
@@ -31,31 +32,38 @@ static inline string to_string (const T& t)
 
 
 static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth);
-static void findCharSize(vector<Rect> & boundRect, int & cHeight,int & cWidth, float & cArea);
+static void findCharSize(vector<Rect> & boundRect, int & cHeight,int & cWidth, \
+                        float & cArea, int & widthLimit, int & numLetters);
 static void mergeBoundRect(vector<Rect> & boundRect,int & index1, int & index2);
 static void clearNullRect(vector<Rect> & boundRect, float & cArea);
 static string textRecognition(Mat & txtImage);
 static void writeFile(string & sResult);
-static Rect addPadding(Rect & rectBox, int & cHeight, int & cWidth, int & iHeight, int &iWidth);
 static Mat addPadding(Mat & wordWindow);
 static bool isMatch(string & sResult, string & wordToSearch);
 static bool withinLengthRange(Rect & rectBox, int & widthLimit);
+static vector<Rect> labelLettersWithBox(Mat &letterWithBox, vector<vector<Point> > & contours);
+static void mergeBox(vector<Rect> & boundRect, int & cHeight, int & cWidth);
+static void searchAndLabelWord(Mat & resultImage, Mat & wordWithBox, Mat & bwImageForTess, \
+                       vector<Rect> & boundRect, string & wordToSearch, int & widthLimit);
+
+
 
 int main(int argc, char** argv)
 {
-  Mat image, grayImage, bwImage, equalImage,  mserImage, outputImage, copyImage;
+  Mat image, grayImage, bwImage, equalImage, wordWithBox, resultImage;
   if (argc != 3) {
     printf("Incorrect input. Please enter: executable + imageFileName + wordToSearch \n");
     return -1;
   }
-  
+  //get input information
   image = imread (argv[1], 1);
-  copyImage = image.clone();
   string wordToSearch = argv[2];
+
+  //copy the image, and parameters(i.e. size) set-up
+  resultImage = image.clone();
   int numLetters = wordToSearch.length();
   int blkSize = 25;
-  // namedWindow("Display_Image", CV_WINDOW_AUTOSIZE);
-  // imshow("Display_Image", image);
+  
   // rgb2gray
   cvtColor(image, grayImage, CV_RGB2GRAY);
   // equalize the image
@@ -64,78 +72,31 @@ int main(int argc, char** argv)
   adaptiveThreshold(grayImage,bwImage, 255, ADAPTIVE_THRESH_MEAN_C,\
 		    THRESH_BINARY_INV, blkSize, 10);
   
-  Mat outputBwImage = bwImage.clone();
+  Mat bwImageForTess = bwImage.clone();
   //add bounding box
-  cvtColor(bwImage, outputImage, CV_GRAY2RGB, 0);
+  cvtColor(bwImage, wordWithBox, CV_GRAY2RGB, 0);
   vector<vector<Point> > contours;
   findContours(bwImage, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
   
-  Mat outputImage2 = outputImage.clone();
+  Mat letterWithBox = wordWithBox.clone();
 
-  int numContours = contours.size();
-  vector<Rect> boundRect(numContours);
-  Scalar color = Scalar(0,0,255);
-  for (int i = 0; i < numContours; i++) {
-    boundRect[i] = boundingRect(contours[i]);
-    rectangle(outputImage2, boundRect[i], color, 1, 8, 0);
-  }
-  imwrite("output_image0.jpg", outputImage);
-  imwrite("output_image2.jpg", outputImage2);
-
+  vector<Rect> boundRect = labelLettersWithBox(letterWithBox, contours);
 
   // estimate the width and height of each character
   int cHeight, cWidth, widthLimit;
   float cArea;
-  findCharSize(boundRect, cHeight, cWidth, cArea);
-  widthLimit = numLetters * cWidth;
-
-
-  // merge the neighbour rectangles
-  for (int i = 0; i < boundRect.size(); i++) { //how to eliminate the nested for-loop?
-    for (int j = i+1; j < boundRect.size(); j++) {
-      if (isNeighbour(boundRect[i], boundRect[j], cHeight, cWidth)) {
-	       mergeBoundRect(boundRect, i, j);
-         break;
-      } 
-    }
-  }
-  // clear already merged rectangles, and too large and too-small regions
+  findCharSize(boundRect, cHeight, cWidth, cArea, widthLimit, numLetters);
+  
+  // merge and then clear already merged rectangles, and too large and too-small regions
+  mergeBox(boundRect, cHeight, cWidth);
   clearNullRect(boundRect, cArea);
 
-  string sResult;
-  int rectNum = boundRect.size();
-  int iHeight = outputBwImage.size().height;
-  int iWidth = outputBwImage.size().width;
-
-  for (int i = 0; i < rectNum; i++) {
-      //Rect wordBound = addPadding(boundRect[i], cHeight, cWidth, iHeight, iWidth);
-      // Mat wordWindow(outputBwImage, wordBound);
-      if (withinLengthRange(boundRect[i], widthLimit)) {
-        Mat wordWindow(outputBwImage, boundRect[i]);
-        Mat wordWindowWithPadding = addPadding(wordWindow);
-        //  imwrite("output_word_" + to_string(i) + ".jpg", wordWindowWithPadding);
-        sResult = textRecognition(wordWindowWithPadding);
-
-        //only circle out the mached words
-       
-        
-        if (isMatch(sResult, wordToSearch)) {
-           rectangle(copyImage, boundRect[i], color, 1, 8, 0);
-        }
-      }
-
-      // rectangle(outputImage, boundRect[i], color, 1, 8, 0);
-      //writeFile(sResult);
-      rectangle(outputImage, boundRect[i], color, 1, 8, 0);
-  }
-					
-  imwrite("gray_image.jpg", grayImage);
-  imwrite("copy_image.jpg", copyImage);
-  imwrite("equal_image.jpg", equalImage);
-  imwrite("bw_image.jpg", bwImage);
-  imwrite("ouptut_image.jpg", outputImage);
-
-  //  imwrite("mser_image.jpg", mserImage); 
+  searchAndLabelWord(resultImage, wordWithBox, bwImageForTess, boundRect, wordToSearch, widthLimit);
+	
+  // output result
+  imwrite("result_image.jpg", resultImage);
+  imwrite("letter_with_bounding_box.jpg", letterWithBox);
+  imwrite("word_with_bounding_box.jpg", wordWithBox);
   printf("image saved successfully.\n");
   return 0;
 }
@@ -156,7 +117,8 @@ static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth)
 }
 
 
-static void findCharSize(vector<Rect> & boundRect, int & cHeight,int & cWidth, float & cArea) {
+static void findCharSize(vector<Rect> & boundRect, int & cHeight, \
+                      int & cWidth, float & cArea, int & widthLimit, int & numLetters) {
   map<int, int> areaMap;	// key: area_value  value: frequency
   int numRects = boundRect.size();
   for(int i = 0; i < numRects; i++) {
@@ -174,6 +136,7 @@ static void findCharSize(vector<Rect> & boundRect, int & cHeight,int & cWidth, f
   cHeight = sqrt(areaAvg) * 1.1;
   cWidth = sqrt(areaAvg) * 0.75;
   cArea = areaAvg;
+  widthLimit = numLetters * cWidth;
  // cout << "character width is " << cWidth << endl;
  // cout << "character height is " << cHeight << endl;
 }
@@ -199,7 +162,6 @@ static void clearNullRect(vector<Rect> & boundRect, float & cArea){
   }
 }
 
-
 static string textRecognition(Mat & txtImage) {
 	// Perform the recognition
   IplImage inputImage = txtImage;
@@ -214,24 +176,6 @@ static void writeFile(string & sResult) {
 	myFile << sResult;
 	myFile.close();
 }
-
-static Rect addPadding(Rect & rectBox, int & cHeight, int & cWidth, int & iHeight, int &iWidth) {
-    Rect wordBound(rectBox);
-    wordBound.x -= 0.3 * cWidth;
-    wordBound.y -= 0.3 * cHeight;
-    wordBound.width += cWidth;
-    wordBound.height += 0.5 * cHeight;
-// is there a better way to do bound checking???
-    wordBound.x = wordBound.x > 0 ? wordBound.x : 0;
-    wordBound.y = wordBound.y > 0 ? wordBound.y : 0;
-    if (wordBound.x + wordBound.width > iWidth) 
-       wordBound.width = iWidth - wordBound.x;
-    if (wordBound.y + wordBound.height > iHeight)
-      wordBound.height = iHeight -wordBound.y;
-
-    return wordBound;
-}
-
 
 static Mat addPadding(Mat & wordWindow) {
   Mat wordWindowWithPadding;
@@ -263,4 +207,48 @@ static bool withinLengthRange(Rect & rectBox, int & widthLimit) {
     return true;
   else 
     return false;
+}
+
+static vector<Rect> labelLettersWithBox(Mat &letterWithBox, vector<vector<Point> > & contours) {
+  int numContours = contours.size();
+  vector<Rect> boundRect(numContours);
+  Scalar color = Scalar(0,0,255);
+  for (int i = 0; i < numContours; i++) {
+    boundRect[i] = boundingRect(contours[i]);
+    rectangle(letterWithBox, boundRect[i], color, 1, 8, 0);
+  }
+  return boundRect;
+}
+
+static void mergeBox(vector<Rect> & boundRect, int & cHeight, int & cWidth) {
+  // merge the neighbour rectangles
+  for (int i = 0; i < boundRect.size(); i++) { //how to eliminate the nested for-loop?
+    for (int j = i+1; j < boundRect.size(); j++) {
+      if (isNeighbour(boundRect[i], boundRect[j], cHeight, cWidth)) {
+         mergeBoundRect(boundRect, i, j);
+         break;  //just break from the inner for-loop to enhance the efficiency
+      } 
+    }
+  }
+}
+
+
+static void searchAndLabelWord(Mat & resultImage, Mat & wordWithBox, Mat & bwImageForTess, \
+                       vector<Rect> & boundRect, string & wordToSearch, int & widthLimit) {
+  int rectNum = boundRect.size();
+  Scalar color = Scalar(0,0,255);
+  for (int i = 0; i < rectNum; i++) {
+      if (withinLengthRange(boundRect[i], widthLimit)) {
+        Mat wordWindow(bwImageForTess, boundRect[i]);
+        Mat wordWindowWithPadding = addPadding(wordWindow);
+        string sResult = textRecognition(wordWindowWithPadding);
+
+        //only circle out the mached words
+        if (isMatch(sResult, wordToSearch)) {
+           rectangle(resultImage, boundRect[i], color, 1, 8, 0);
+        }
+      }
+      //writeFile(sResult);
+      rectangle(wordWithBox, boundRect[i], color, 1, 8, 0);
+  }
 }
