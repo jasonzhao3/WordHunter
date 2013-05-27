@@ -10,6 +10,7 @@ using namespace std;
 
 
 #define TESS_DATA_CONFIG "alphanumeric"
+#define MAX_WORD_LENGTH 25
 // the  name corresponds to the configs files in the tessdata/config 
 
 //comparator used for rectangle comparation
@@ -46,8 +47,8 @@ static void mergeBox(vector<Rect> & boundRect, int & cHeight, int & cWidth);
 static void searchAndLabelWord(Mat & resultImage, Mat & wordWithBox, Mat & bwImageForTess, \
                        vector<Rect> & boundRect, string & wordToSearch, int & widthLimit);
 static void deskewText(Mat & src, Mat & deskewedImg);
-
-
+static int findEditDistance(const string str1, const string str2, int cutoff, int order);
+int Min(int dis1, int dis2, int dis3);
 
 int main(int argc, char** argv)
 {
@@ -211,10 +212,41 @@ static Mat addPadding(Mat & wordWindow) {
 
 static bool isMatch(string &sResult, string &wordToSearch) {
   //may need change to use edit distance
-  if (wordToSearch.compare(sResult) == 0) 
+  int dis = findEditDistance(sResult, wordToSearch, (int)wordToSearch.length() * 0.3, 0);
+  float ratio = (float) dis / wordToSearch.length();
+  cout << ratio << endl;
+  if (dis == 0 || (ratio < 0.38 && dis > 0) )
     return true;
   else return false;
 }
+
+static int findEditDistance(const string str1, const string str2, int cutoff, int order) {
+    if (str1.compare(str2) == 0) return 0;
+    if (order > cutoff) return cutoff + 1;  //the point is to make it bigger than cutoff
+
+    if (str1.empty()) return str2.length();
+    if (str2.empty())  return str1.length();   //cannot be str1 == NULL
+    if (str1[0] == str2[0]) return findEditDistance(str1.substr(1), str2.substr(1), cutoff, order);
+    if (str1[0] != str2[0]) {
+       int dis1 = findEditDistance(str1, str2.substr(1), cutoff, order + 1) + 1;
+       int dis2 = findEditDistance(str2, str1.substr(1), cutoff, order + 1) + 1;
+       int dis3 = findEditDistance(str1.substr(1), str2.substr(1), cutoff, order + 1) + 1;
+       return Min(dis1, dis2, dis3);
+    }
+    return -1; //error flag
+}
+
+int Min(int dis1, int dis2, int dis3) {
+    int dis[3] = {dis1, dis2, dis3};
+    int minTmp = dis1;
+    for (int i = 1; i < 3; i++) {
+       minTmp = minTmp < dis[i] ? minTmp : dis[i];
+    }
+    return minTmp;
+}
+
+
+
 
 static bool withinLengthRange(Rect & rectBox, int & widthLimit) {
   float width = rectBox.width;
