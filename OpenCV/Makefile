@@ -1,38 +1,44 @@
-#-----Macros---------------------------------                                                                                                                                                         
-# set up compiler options                                                                                                                                                                              
-OPENCV_INCLUDE_DIR=/afs/ir/class/cs232/opencv-2.4.5/install/include
-OPENCV_LIBRARY_DIR=/afs/ir/class/cs232/opencv-2.4.5/install/lib
+#-----Macros---------------------------------
+INCLUDES = -I./include/
+OPTFLAGS = -g -O2
+
+# set up compiler options
 CXX = g++
-INCLUDES = -I. -I$(OPENCV_INCLUDE_DIR)
-CXXFLAGS = $(INCLUDES) -O3 -g
+CXXFLAGS = $(INCLUDES) $(OPTFLAGS)
 
-# set up linker options                                                                                                                                                                               
-LFLAGS = -L$(OPENCV_LIBRARY_DIR) \
-        -lopencv_core \
-        -lopencv_highgui \
-        -lopencv_imgproc \
-        -lopencv_features2d \
-        -lopencv_calib3d \
-        -lopencv_ml \
-        -lopencv_video \
-        -lopencv_objdetect
+# setup relevant libraries
+OPENCV_CFLAGS = `pkg-config --cflags opencv`
 
-#-----File Dependencies----------------------                                                                                                                                                         
-EXE = test
+CXXFLAGS += $(OPENCV_CFLAGS) 
 
-SRC = main.cc
+OPENCV_LFLAGS = `pkg-config --libs opencv`
 
-OBJ = $(addsuffix .o, $(basename $(SRC)))
+LFLAGS += $(OPENCV_LFLAGS) -L../lib -ltessocr -ltesslib -llept 
+
+# build configurations
+OBJ_PATH 	= objs
+SRC_PATH	= src
+EXE			= ./extract_text
+
+SRC = $(wildcard ./$(SRC_PATH)/*.cpp)
+OBJ = $(addprefix $(OBJ_PATH)/, $(notdir $(addsuffix .o, $(basename $(SRC)))))
+
+#-----Compile Rules---------------------------
+$(OBJ_PATH)/%.o: $(SRC_PATH)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+	@echo -n "$(OBJ_PATH)/" > $@.d.tmp
+	@$(CXX) $(CXXFLAGS) -MM $< >> $@.d.tmp
+	@mv $@.d.tmp $@.d
+
+all: $(EXE)
 
 $(EXE): $(OBJ)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJ) $(LFLAGS)
+	$(CXX) -o $(EXE) $(OBJ) $(LFLAGS)
 
-%.o: %.cc
-	$(CXX) $(CXXFLAGS) -c $<
+clean: 
+	rm -f $(addsuffix .d, $(OBJ)) $(addsuffix .d.tmp, $(OBJ)) $(OBJ) $(EXE) 
 
-#-----Other stuff----------------------------                                                                                                                                                          
-depend:
-	makedepend $(CXXFLAGS) -Y $(SRC)
+#-----File Dependencies----------------------
+-include $(addsuffix .d, $(OBJ))
 
-clean:
-	rm -f $(OBJ) $(EXE) *.cc~ *.h~ Makefile~
+

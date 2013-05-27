@@ -45,12 +45,13 @@ static vector<Rect> labelLettersWithBox(Mat &letterWithBox, vector<vector<Point>
 static void mergeBox(vector<Rect> & boundRect, int & cHeight, int & cWidth);
 static void searchAndLabelWord(Mat & resultImage, Mat & wordWithBox, Mat & bwImageForTess, \
                        vector<Rect> & boundRect, string & wordToSearch, int & widthLimit);
+static void deskewText(Mat & src, Mat & deskewedImg);
 
 
 
 int main(int argc, char** argv)
 {
-  Mat image, grayImage, bwImage, equalImage, wordWithBox, resultImage;
+  Mat image, grayImage, bwImage, equalImage, deskewedImage, wordWithBox, resultImage;
   if (argc != 3) {
     printf("Incorrect input. Please enter: executable + imageFileName + wordToSearch \n");
     return -1;
@@ -69,19 +70,33 @@ int main(int argc, char** argv)
   // equalize the image
   equalizeHist(grayImage, equalImage);
   // gray2bw
-  adaptiveThreshold(grayImage,bwImage, 255, ADAPTIVE_THRESH_MEAN_C,\
+  adaptiveThreshold(grayImage, bwImage, 255, ADAPTIVE_THRESH_MEAN_C,\
 		    THRESH_BINARY_INV, blkSize, 10);
   
-  Mat bwImageForTess = bwImage.clone();
+   //deskewText(bwImage, deskewedImage);
+
+
+  deskewedImage = bwImage;
+
+  Mat bwImageForTess = deskewedImage.clone();
   //add bounding box
-  cvtColor(bwImage, wordWithBox, CV_GRAY2RGB, 0);
+  cvtColor(deskewedImage, wordWithBox, CV_GRAY2RGB, 0);
+
+  //vector<Vec4i> hierarchy;
   vector<vector<Point> > contours;
-  findContours(bwImage, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
-  
+  //Mat contourImage;
+  //cvtColor(deskewedImage, contourImage, CV_GRAY2RGB, 0);  
+  findContours(deskewedImage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+  // findContours(deskewedImage, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
+  // for (int i = 0; i < contours.size(); i++) {
+  //   drawContours(contourImage, contours, i, Scalar(255, 0, 0), 1, 8, hierarchy, 0, Point());
+  // }
+  // imwrite("contours.jpg", contourImage);
+
   Mat letterWithBox = wordWithBox.clone();
 
   vector<Rect> boundRect = labelLettersWithBox(letterWithBox, contours);
-
+  //imwrite("immediate_after_letter_label.jpg", letterWithBox);
   // estimate the width and height of each character
   int cHeight, cWidth, widthLimit;
   float cArea;
@@ -203,7 +218,7 @@ static bool isMatch(string &sResult, string &wordToSearch) {
 
 static bool withinLengthRange(Rect & rectBox, int & widthLimit) {
   float width = rectBox.width;
-  if (width > 0.8 * widthLimit && width < 1.2 * widthLimit) 
+  if (width > 0.65 * widthLimit && width < 1.2 * widthLimit) 
     return true;
   else 
     return false;
@@ -251,4 +266,79 @@ static void searchAndLabelWord(Mat & resultImage, Mat & wordWithBox, Mat & bwIma
       //writeFile(sResult);
       rectangle(wordWithBox, boundRect[i], color, 1, 8, 0);
   }
+}
+
+
+
+static void deskewText(Mat & src, Mat & deskewedImg)
+{
+  int threshold_value = 0;
+  int threshold_type = THRESH_BINARY;;
+  int const max_value = 255;
+  int const max_type = 4;
+  int const max_BINARY_value = 255;
+  double const PAD = 0.4;
+  int top, bottom, left, right;
+  int borderType;
+  Scalar value; 
+  
+  Mat adapt_img = src;
+  Mat adapt_img_padded;
+
+  /// Load an image
+  //src = imread( argv[1], 1 );
+
+  Size size = src.size();
+  /// Convert the image to Gray
+  //cvtColor( src, src_gray, CV_RGB2GRAY );
+
+  vector<Vec4i> lines;
+
+  top = (int) (PAD *adapt_img.rows);
+  bottom = (int) (PAD *adapt_img.rows);
+  left = (int) (PAD *adapt_img.rows);
+  right = (int) (PAD *adapt_img.rows);
+  borderType = BORDER_CONSTANT;
+  value = Scalar(0, 0, 0); // pad with all black
+  //imshow("Before padding", adapt_img);
+  copyMakeBorder (adapt_img, adapt_img_padded, top, bottom, left, right, borderType, value);
+  //imshow("after padding", adapt_img_padded);
+  HoughLinesP(adapt_img_padded, lines, 1, CV_PI/180, 100, size.width / 2.f, 20);
+
+  Mat disp_lines(size, CV_8UC1, Scalar(0, 0, 0));
+  double angle = 0.;
+  double angle_degrees = 0.;
+  unsigned nb_lines = lines.size();
+  for (unsigned i = 0; i < nb_lines; ++i)
+  {
+      line(disp_lines, Point(lines[i][0], lines[i][1]), Point(lines[i][2], lines[i][3]), Scalar(255, 0 ,0));
+      angle += atan2((double)lines[i][3] - lines[i][1],
+                     (double)lines[i][2] - lines[i][0]);
+  }
+  angle /= nb_lines; // mean angle, in radians.
+  angle_degrees = angle * 180/CV_PI; // mean angle, in radians.
+
+  printf ("angle is %f\n", angle_degrees); 
+  //imshow("Hough Lines", disp_lines);
+
+  // Compute the bounding box of the entire text:
+  vector<Point> points;
+  Mat_<uchar>::iterator it = adapt_img_padded.begin<uchar>();
+  Mat_<uchar>::iterator end = adapt_img_padded.end<uchar>();
+  for (; it != end; ++it) {
+    if (*it) {
+      points.push_back(it.pos());
+    }
+  }
+  RotatedRect box = minAreaRect(Mat(points));
+  Mat rot_mat = getRotationMatrix2D(box.center, angle_degrees, 1);
+  std::cout << "rotation matrix = " << std::endl << " " << rot_mat << std::endl << std::endl;
+  
+  warpAffine(adapt_img_padded, deskewedImg, rot_mat, adapt_img_padded.size(), INTER_CUBIC);
+  std::cout << box.center.x << ", " << box.center.y << std::endl;
+  // imshow("Rotated", rotated);
+
+  // waitKey(0);
+  imwrite("out_img_drawing.jpg", deskewedImg);
+
 }
