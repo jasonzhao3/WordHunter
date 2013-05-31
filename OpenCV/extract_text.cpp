@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 {
   Mat image, grayImage, bwImage, equalImage, deskewedImage, wordWithBox, resultImage;
   if (argc != 3) {
-    printf("Incorrect input. Please enter: executable + imageFileName + wordToSearch \n");
+    printf("Incorrect input. Please enter: executable + imageFileName + wordToSearch\n");
     return -1;
   }
   //get input information
@@ -74,25 +74,26 @@ int main(int argc, char** argv)
   adaptiveThreshold(grayImage, bwImage, 255, ADAPTIVE_THRESH_MEAN_C,\
 		    THRESH_BINARY_INV, blkSize, 10);
   
-   //deskewText(bwImage, deskewedImage);
+   deskewText(bwImage, deskewedImage);
+//        deskewedImage = bwImage;
 
 
-  deskewedImage = bwImage;
+
 
   Mat bwImageForTess = deskewedImage.clone();
   //add bounding box
   cvtColor(deskewedImage, wordWithBox, CV_GRAY2RGB, 0);
 
-  //vector<Vec4i> hierarchy;
+  vector<Vec4i> hierarchy;
   vector<vector<Point> > contours;
-  //Mat contourImage;
-  //cvtColor(deskewedImage, contourImage, CV_GRAY2RGB, 0);  
-  findContours(deskewedImage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-  // findContours(deskewedImage, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
-  // for (int i = 0; i < contours.size(); i++) {
-  //   drawContours(contourImage, contours, i, Scalar(255, 0, 0), 1, 8, hierarchy, 0, Point());
-  // }
-  // imwrite("contours.jpg", contourImage);
+  Mat contourImage;
+  cvtColor(deskewedImage, contourImage, CV_GRAY2RGB, 0);  
+  //findContours(deskewedImage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+  findContours(deskewedImage, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
+   for (int i = 0; i < contours.size(); i++) {
+     drawContours(contourImage, contours, i, Scalar(255, 0, 0), 1, 8, hierarchy, 0, Point());
+   }
+   imwrite("contours.jpg", contourImage);
 
   Mat letterWithBox = wordWithBox.clone();
 
@@ -114,6 +115,8 @@ int main(int argc, char** argv)
   imwrite("letter_with_bounding_box.jpg", letterWithBox);
   imwrite("word_with_bounding_box.jpg", wordWithBox);
   printf("image saved successfully.\n");
+  printf("Please only look at word_with_bounding_box.jpg for the solution\n");
+  waitKey(0);
   return 0;
 }
 
@@ -214,7 +217,7 @@ static bool isMatch(string &sResult, string &wordToSearch) {
   //may need change to use edit distance
   int dis = findEditDistance(sResult, wordToSearch, (int)wordToSearch.length() * 0.3, 0);
   float ratio = (float) dis / wordToSearch.length();
-  cout << ratio << endl;
+  cout << "Ratio between " << sResult << " and " << wordToSearch << " = " << dis << "/" <<wordToSearch.length() << " = " << ratio << endl;
   if (dis == 0 || (ratio < 0.38 && dis > 0) )
     return true;
   else return false;
@@ -289,14 +292,17 @@ static void searchAndLabelWord(Mat & resultImage, Mat & wordWithBox, Mat & bwIma
         Mat wordWindow(bwImageForTess, boundRect[i]);
         Mat wordWindowWithPadding = addPadding(wordWindow);
         string sResult = textRecognition(wordWindowWithPadding);
+        //cout << "Found word = " << sResult << endl;
 
         //only circle out the mached words
         if (isMatch(sResult, wordToSearch)) {
            rectangle(resultImage, boundRect[i], color, 1, 8, 0);
+           rectangle(wordWithBox, boundRect[i], color, 1, 8, 0);
         }
+      //Moving this inside to show the candidate words
       }
       //writeFile(sResult);
-      rectangle(wordWithBox, boundRect[i], color, 1, 8, 0);
+      //rectangle(wordWithBox, boundRect[i], color, 1, 8, 0);
   }
 }
 
@@ -316,6 +322,8 @@ static void deskewText(Mat & src, Mat & deskewedImg)
   
   Mat adapt_img = src;
   Mat adapt_img_padded;
+  Mat after_erode;
+  Mat deskewedImg_blurred;
 
   /// Load an image
   //src = imread( argv[1], 1 );
@@ -365,12 +373,17 @@ static void deskewText(Mat & src, Mat & deskewedImg)
   RotatedRect box = minAreaRect(Mat(points));
   Mat rot_mat = getRotationMatrix2D(box.center, angle_degrees, 1);
   std::cout << "rotation matrix = " << std::endl << " " << rot_mat << std::endl << std::endl;
-  
-  warpAffine(adapt_img_padded, deskewedImg, rot_mat, adapt_img_padded.size(), INTER_CUBIC);
-  std::cout << box.center.x << ", " << box.center.y << std::endl;
-  // imshow("Rotated", rotated);
 
+  Mat se = getStructuringElement(MORPH_ELLIPSE, Size(3,3));  
+   
+  erode(adapt_img_padded, after_erode, se);
+  //warpAffine(after_erode, deskewedImg, rot_mat, adapt_img_padded.size(), INTER_CUBIC);
+  warpAffine(adapt_img_padded, deskewedImg_blurred, rot_mat, adapt_img_padded.size(), INTER_LANCZOS4, BORDER_TRANSPARENT);
+  std::cout << box.center.x << ", " << box.center.y << std::endl;
+  //imshow("after deskew", deskewedImg);
+
+  threshold(deskewedImg_blurred, deskewedImg, 128, 255, THRESH_BINARY);
   // waitKey(0);
-  imwrite("out_img_drawing.jpg", deskewedImg);
+  //imwrite("out_img_drawing.jpg", deskewedImg);
 
 }
