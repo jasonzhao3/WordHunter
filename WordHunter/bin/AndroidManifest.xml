@@ -5,8 +5,8 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="5"
-        android:targetSdkVersion="17" />
+        android:minSdkVersion="7"
+        android:targetSdkVersion="7" />
 
     <uses-permission android:name="android.permission.CAMERA" />
 
@@ -19,7 +19,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.example.wordhunter.MainActivity"
+            android:name="com.ee368project.wordhunter.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,13 +28,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.wordhunter.WordHunterActivity"
-            android:screenOrientation="landscape" 
-            android:label="@string/title_activity_word_hunter"
-            android:parentActivityName="com.example.wordhunter.MainActivity" >
+            android:name="com.ee368project.wordhunter.SnapWordActivity"
+            android:label="@string/title_activity_snap_word" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.wordhunter.MainActivity" />
+                android:value="com.ee368project.wordhunter.MainActivity" />
         </activity>
     </application>
 
