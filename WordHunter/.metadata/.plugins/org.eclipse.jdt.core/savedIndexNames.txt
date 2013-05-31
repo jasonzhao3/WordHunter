@@ -1,5 +1,0 @@
-INDEX VERSION 1.126+D:\_Stanford\Course_Information\EE368\Project\WordHunter\.metadata\.plugins\org.eclipse.jdt.core
-2886007712.index
-2935907402.index
-3470234857.index
-749581877.index
