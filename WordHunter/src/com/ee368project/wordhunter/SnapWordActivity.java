@@ -1,15 +1,16 @@
 package com.ee368project.wordhunter;
-
+import com.ee368project.wordhunter.Preview;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
+import android.os.Environment;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
-
-import com.example.wordhunter.R;
 
 public class SnapWordActivity extends Activity {
 
@@ -52,6 +53,26 @@ public class SnapWordActivity extends Activity {
 		return true;
 	}
 	
-	
+	@Override
+	public boolean onKeyDown(int keycode, KeyEvent event) {
+		// check if the camera button is pressed
+		if (keycode == KeyEvent.KEYCODE_CAMERA) {
+			// if SnapMode -- why the state variable cannot be used here??
+//			if (mModeFlag == 1 && mLabelOnTop.mState == 1) {
+//				mLabelOnTop.mState = 0;
+//			} else if (mModeFlag == 1 && mFocusFlag == false) {
+//				mCamera.takePicture(mShutterCallback, mRawCallback,
+//						mJpegCallback);
+//			}
+			mPreview.mCamera.takePicture(mPreview.mShutterCallback, mPreview.mRawCallback,
+					mPreview.mJpegCallback);
+			// no matter what mode, whenever the user touch the screen,
+			// set the focusFlag to false, to enable refocus
+			mPreview.mFocusFlag = false;
+			return true;
+		}
+		return super.onKeyDown(keycode, event);
+	}
+
 
 }

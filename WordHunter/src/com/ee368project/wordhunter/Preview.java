@@ -1,6 +1,7 @@
 package com.ee368project.wordhunter;
 
-import com.ee368project.*;
+
+
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -12,6 +13,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -52,10 +54,11 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	PictureCallback mJpegCallback;
 	Camera.AutoFocusCallback mAutoFocusCallback;
 
-	private final String SERVERURL = "http://www.stanford.edu/~yzhao3/cgi-bin/ee368/test.php";
+	private final String SERVERURL = "http://www.stanford.edu/~yzhao3/cgi-bin/ee368/searchWordOnCorn.php";
 	// name for storing image captured by camera view
 	private final static String INPUT_IMG_FILENAME = "/temp.jpg";
 	private static final String TAG = "WordHunterPreviewClass";
+	private static final String LOG_TAG = "Android Debug Log";
 
 	Preview(Context context, LabelOnTop labelOnTop, int modeFlag) {
 		super(context);
@@ -76,16 +79,6 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			public void onShutter() {
 
 			}
-			// public void onShutter() {
-			// try {
-			// Thread.sleep(600);
-			// } catch (InterruptedException e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// }
-			// // Thread.yield();
-			// mCamera.startPreview();
-			// }
 		};
 
 		// Handles data for raw picture
@@ -98,30 +91,6 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		// Define jpeg callback
 		mJpegCallback = new PictureCallback() {
 			public void onPictureTaken(byte[] data, Camera camera) {
-				// Start query thread
-//				mLabelOnTop.mQueryJpegData = new byte[data.length];
-//				System.arraycopy(data, 0, mLabelOnTop.mQueryJpegData, 0,
-//						data.length);
-//				Thread thread = new Thread(null, mLabelOnTop.mImageUploader,
-//						"Background");
-//				thread.start();
-//
-//				// Save image to file
-//				try {
-//					FileOutputStream fileOutputStream = new FileOutputStream(
-//							mLabelOnTop.mImageFilename);
-//					fileOutputStream.write(data);
-//				} catch (FileNotFoundException exception) {
-//					Log.e("debug_log", exception.toString());
-//				} catch (IOException exception) {
-//					Log.e("debug_log", exception.toString());
-//				}
-
-				// // Start query thread
-				// Thread thread = new Thread(null, mDrawOnTop.mFileUploader,
-				// "Background");
-				// thread.start();
-				
 //				Intent mIntent = new Intent();
   				//compress image
   				compressByteImage(mContext, data, 75);  				
@@ -133,8 +102,6 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
   				
   				//start the camera view again .
   				camera.startPreview();  
-				
-				
 			}
 		};
 
@@ -153,6 +120,78 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		};
 	}
 
+	
+	public void surfaceCreated(SurfaceHolder holder) {
+		mCamera = Camera.open();
+		try {
+			mCamera.setPreviewDisplay(holder);
+
+			// Preview callback is invoked whenever new view frame is
+			// available
+			mCamera.setPreviewCallback(new PreviewCallback() {
+				  // Called for each frame previewed
+		        public void onPreviewFrame(byte[] data, Camera camera) {  // <11>
+		           Preview.this.invalidate();  // <12>
+		        }
+		      });
+		   
+
+
+			// Define on touch listener
+			// what is the difference between this callback function and the
+			// onKeyDown function???
+			this.setOnTouchListener(new OnTouchListener() {
+				public boolean onTouch(View v, MotionEvent event) {
+					mFocusFlag = false;
+					// if (mLabelOnTop.mState == LabelOnTop.STATE_ORIGINAL) {
+					// mLabelOnTop.mState = LabelOnTop.STATE_PROCESSED;
+					// } else if (mLabelOnTop.mState ==
+					// LabelOnTop.STATE_PROCESSED) {
+					// mLabelOnTop.mState = LabelOnTop.STATE_ORIGINAL;
+					// }
+					mCamera.takePicture(mShutterCallback, mRawCallback,
+							mJpegCallback);
+					return false;
+				}
+			});
+
+		} catch (IOException exception) {
+			mCamera.release();
+			mCamera = null;
+		}
+
+	}
+	
+	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+		// Now that the size is known, set up the camera parameters and begin
+		// the preview.
+		Camera.Parameters parameters = mCamera.getParameters();
+		parameters.setPreviewSize(320, 240);
+		parameters.setPictureSize(200, 180);
+		List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
+		Log.d(LOG_TAG, "hello everybody\n");
+		
+		for (Camera.Size size : sizes) {
+			Log.d(LOG_TAG, "supported camerasize: height: " + size.height + " width:  " + size.width);
+		}
+		parameters.setPreviewFrameRate(15);
+//		parameters.setSceneMode(Camera.Parameters.SCENE_MODE_NIGHT);
+//		parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+		mCamera.setParameters(parameters);
+		mCamera.startPreview();
+	}
+
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		// Surface will be destroyed when we return, so stop the preview.
+		// Because the CameraDevice object is not a shared resource, it's very
+		// important to release it when the activity is paused.
+		mFinished = true;
+		mCamera.setPreviewCallback(null);
+		mCamera.stopPreview();
+		mCamera.release();
+		mCamera = null;
+	}
+	
 	// store the image as a jpeg image
 	public boolean compressByteImage(Context mContext, byte[] imageData,
 			int quality) {
@@ -210,92 +249,9 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		return super.onKeyDown(keycode, event);
 	}
 
-	public void surfaceCreated(SurfaceHolder holder) {
-		mCamera = Camera.open();
-		try {
-			mCamera.setPreviewDisplay(holder);
+	
 
-			// Preview callback is invoked whenever new view frame is
-			// available
-			mCamera.setPreviewCallback(new PreviewCallback() {
-				public void onPreviewFrame(byte[] data, Camera camera) {
-
-					if ((mLabelOnTop == null) || mFinished
-							|| (mFocusFlag == false))
-						return;
-					// only if the camera is focused can we create/update the
-					// mBitmap
-					if (mLabelOnTop.mBitmap == null) {
-						// Initialize the draw-on-top companion
-						// If mLabelOnTop.mBitmap == null, means no frame
-						// yet,
-						// so just create a new bitmap
-						Camera.Parameters params = camera.getParameters();
-						mLabelOnTop.mImageWidth = params.getPreviewSize().width;
-						mLabelOnTop.mImageHeight = params.getPreviewSize().height;
-						mLabelOnTop.mBitmap = Bitmap
-								.createBitmap(mLabelOnTop.mImageWidth,
-										mLabelOnTop.mImageHeight,
-										Bitmap.Config.RGB_565);
-						mLabelOnTop.mRGBData = new int[mLabelOnTop.mImageWidth
-								* mLabelOnTop.mImageHeight];
-						mLabelOnTop.mYUVData = new byte[data.length];
-					} else {
-
-						// Pass YUV data to draw-on-top companion
-						System.arraycopy(data, 0, mLabelOnTop.mYUVData, 0,
-								data.length);
-						mLabelOnTop.invalidate();
-
-					}
-				}
-			});
-
-			// Define on touch listener
-			// what is the difference between this callback function and the
-			// onKeyDown function???
-			this.setOnTouchListener(new OnTouchListener() {
-				public boolean onTouch(View v, MotionEvent event) {
-					mFocusFlag = false;
-					// if (mLabelOnTop.mState == LabelOnTop.STATE_ORIGINAL) {
-					// mLabelOnTop.mState = LabelOnTop.STATE_PROCESSED;
-					// } else if (mLabelOnTop.mState ==
-					// LabelOnTop.STATE_PROCESSED) {
-					// mLabelOnTop.mState = LabelOnTop.STATE_ORIGINAL;
-					// }
-					return false;
-				}
-			});
-
-		} catch (IOException exception) {
-			mCamera.release();
-			mCamera = null;
-		}
-
-	}
-
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		// Surface will be destroyed when we return, so stop the preview.
-		// Because the CameraDevice object is not a shared resource, it's very
-		// important to release it when the activity is paused.
-		mFinished = true;
-		mCamera.setPreviewCallback(null);
-		mCamera.stopPreview();
-		mCamera.release();
-		mCamera = null;
-	}
-
-	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-		// Now that the size is known, set up the camera parameters and begin
-		// the preview.
-		Camera.Parameters parameters = mCamera.getParameters();
-		parameters.setPreviewSize(320, 240);
-		parameters.setPreviewFrameRate(15);
-		parameters.setSceneMode(Camera.Parameters.SCENE_MODE_NIGHT);
-		parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-		mCamera.setParameters(parameters);
-		mCamera.startPreview();
-	}
+	
 
 	/**
 	 * Inner class -- ServerTask, used to upload the image file to the server

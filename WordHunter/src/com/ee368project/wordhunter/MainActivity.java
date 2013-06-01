@@ -7,8 +7,6 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 
-import com.example.wordhunter.R;
-
 public class MainActivity extends Activity {
 
 	public final static String WORD_TO_SEARCH = "com.ee368project.wordhunter.MESSAGE";
