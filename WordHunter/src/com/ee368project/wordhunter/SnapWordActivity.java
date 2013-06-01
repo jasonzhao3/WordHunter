@@ -35,7 +35,7 @@ public class SnapWordActivity extends Activity {
 		// Create our DrawOnTop view.
 		mLabelOnTop = new LabelOnTop(this);
 		// SnapMode: modeFlag = true
-		mPreview = new Preview(this, mLabelOnTop, 1);
+		mPreview = new Preview(this, mLabelOnTop, 1, message);
 	
 		setContentView(mPreview);
 		addContentView(mLabelOnTop, new LayoutParams(LayoutParams.WRAP_CONTENT,

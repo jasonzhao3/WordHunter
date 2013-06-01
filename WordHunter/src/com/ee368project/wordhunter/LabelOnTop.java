@@ -24,16 +24,6 @@ public class LabelOnTop extends View {
 	//mState = 0
 	int mState;
 
-	// Image query
-	HttpFileUploader mFileUploader;
-	HttpImageUploader mImageUploader;
-	String mMatchTitle;
-	Thread mCurrQueryThread;
-	String mUploadLocation;
-	String mImageFilename;
-	Bitmap mQueryBitmap;
-	Bitmap mFrontCoverBitmap;
-	byte[] mQueryJpegData;
 
 	static final int STATE_ORIGINAL = 0;
 	static final int STATE_SNAP_MODE = 1;
@@ -64,50 +54,62 @@ public class LabelOnTop extends View {
 	// describe the colors and styles for the drawing).
 	@Override
 	protected void onDraw(Canvas canvas) {
-		if (mBitmap != null) {
-			int canvasWidth = canvas.getWidth();
-			int canvasHeight = canvas.getHeight();
-			int newImageWidth = 640;
-			int newImageHeight = 480;
-			int marginWidth = (canvasWidth - newImageWidth) / 2;
-
-			// Draw result image
-			if (mState == STATE_ORIGINAL) {
-				
-			}
-			else if (mState == STATE_SNAP_MODE) {
-				// Draw bitmap
-				Rect src = new Rect(0, 0, mImageWidth, mImageHeight);
-				Rect dst = new Rect(marginWidth, 0, canvasWidth - marginWidth,
-						canvasHeight);
-				canvas.drawBitmap(mBitmap, src, dst, mPaintRed);
-			} else { //STATE_SCAN_MODE
-				return;  
-			}
-
+		//Snap mode
+		if (mState == 1 && mBitmap != null)
+		{
+			//get result image size
+			Rect src = new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
 			
-			// Draw label
-			String imageStateStr;
-			if (mState == STATE_ORIGINAL)
-				imageStateStr = "Original Image";
-			else if (mState == STATE_SNAP_MODE)
-				imageStateStr = "Processed Image";
-			else 
-				imageStateStr = "Scan Mode";
+			//get current screen size
+			Rect dst=new Rect(0,0,canvas.getWidth(),canvas.getHeight());
 			
-			canvas.drawText(imageStateStr, marginWidth + 10 - 1, 30 - 1,
-					mPaintRed);
-			canvas.drawText(imageStateStr, marginWidth + 10 + 1, 30 - 1,
-					mPaintRed);
-			canvas.drawText(imageStateStr, marginWidth + 10 + 1, 30 + 1,
-					mPaintRed);
-			canvas.drawText(imageStateStr, marginWidth + 10 - 1, 30 + 1,
-					mPaintRed);
-			canvas.drawText(imageStateStr, marginWidth + 10, 30, mPaintRed);
-
-		} // end if statement
-
-		super.onDraw(canvas);
+			//draw the bitmap
+			canvas.drawBitmap(mBitmap, src, dst, mPaintRed);
+		}
+//		if (mBitmap != null) {
+//			int canvasWidth = canvas.getWidth();
+//			int canvasHeight = canvas.getHeight();
+//			int newImageWidth = 640;
+//			int newImageHeight = 480;
+//			int marginWidth = (canvasWidth - newImageWidth) / 2;
+//
+//			// Draw result image
+//			if (mState == STATE_ORIGINAL) {
+//				
+//			}
+//			else if (mState == STATE_SNAP_MODE) {
+//				// Draw bitmap
+//				Rect src = new Rect(0, 0, mImageWidth, mImageHeight);
+//				Rect dst = new Rect(marginWidth, 0, canvasWidth - marginWidth,
+//						canvasHeight);
+//				canvas.drawBitmap(mBitmap, src, dst, mPaintRed);
+//			} else { //STATE_SCAN_MODE
+//				return;  
+//			}
+//
+//			
+//			// Draw label
+//			String imageStateStr;
+//			if (mState == STATE_ORIGINAL)
+//				imageStateStr = "Original Image";
+//			else if (mState == STATE_SNAP_MODE)
+//				imageStateStr = "Processed Image";
+//			else 
+//				imageStateStr = "Scan Mode";
+//			
+//			canvas.drawText(imageStateStr, marginWidth + 10 - 1, 30 - 1,
+//					mPaintRed);
+//			canvas.drawText(imageStateStr, marginWidth + 10 + 1, 30 - 1,
+//					mPaintRed);
+//			canvas.drawText(imageStateStr, marginWidth + 10 + 1, 30 + 1,
+//					mPaintRed);
+//			canvas.drawText(imageStateStr, marginWidth + 10 - 1, 30 + 1,
+//					mPaintRed);
+//			canvas.drawText(imageStateStr, marginWidth + 10, 30, mPaintRed);
+//
+//		} // end if statement
+//
+//		super.onDraw(canvas);
 
 	} // end onDraw method
 

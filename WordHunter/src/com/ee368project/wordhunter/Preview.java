@@ -2,6 +2,7 @@ package com.ee368project.wordhunter;
 
 
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -13,7 +14,17 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.ByteArrayBuffer;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -46,6 +57,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	boolean mFocusFlag;
 	int mModeFlag;
 	boolean mFinished;
+	String wordToSearch;
 
 	private Context mContext;
 
@@ -60,14 +72,14 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	private static final String TAG = "WordHunterPreviewClass";
 	private static final String LOG_TAG = "Android Debug Log";
 
-	Preview(Context context, LabelOnTop labelOnTop, int modeFlag) {
+	Preview(Context context, LabelOnTop labelOnTop, int modeFlag, String message) {
 		super(context);
 		mContext = context;
 		mLabelOnTop = labelOnTop;
 		mFinished = false;
 		mFocusFlag = false;
 		mModeFlag = modeFlag;
-
+		wordToSearch = message;
 		// Install a SurfaceHolder.Callback so we get notified when the
 		// underlying surface is created and destroyed.
 		mHolder = getHolder();
@@ -166,8 +178,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		// Now that the size is known, set up the camera parameters and begin
 		// the preview.
 		Camera.Parameters parameters = mCamera.getParameters();
-		parameters.setPreviewSize(320, 240);
-		parameters.setPictureSize(200, 180);
+		parameters.setPreviewSize(960, 1280);
+		parameters.setPictureSize(960, 1280);
 		List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
 		Log.d(LOG_TAG, "hello everybody\n");
 		
@@ -280,7 +292,9 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			final String boundary = "*****";
 
 			try {
-				URL url = new URL(SERVERURL);
+				String urlString = SERVERURL + "?word=" + wordToSearch;
+				Log.d(TAG, urlString);
+				URL url = new URL(urlString);
 				// Open a HTTP connection to the URL
 				final HttpURLConnection conn = (HttpURLConnection) url
 						.openConnection();
@@ -339,6 +353,41 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		}
 
+		 void postData(String wordToSearch){  
+	        // Create a new HttpClient and Post Header
+	        HttpClient httpclient = new DefaultHttpClient();
+	        HttpPost httppost = new HttpPost("http://www.yourdomain.com/post.php");  
+	 
+	        try {
+	            // Add your data
+	            List nameValuePairs = new ArrayList(1);
+	            nameValuePairs.add(new BasicNameValuePair("data1", "dataValue"));
+	            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
+	 
+	            // Execute HTTP Post Request
+	            HttpResponse response = httpclient.execute(httppost);
+	 
+	            InputStream is = response.getEntity().getContent();
+	            BufferedInputStream bis = new BufferedInputStream(is);
+	            ByteArrayBuffer baf = new ByteArrayBuffer(20);
+	 
+	            int current = 0;
+	             
+	            while((current = bis.read()) != -1){
+	                baf.append((byte)current);
+	            }  
+	 
+	            /* Convert the Bytes read to a String. */
+	            wordToSearch = new String(baf.toByteArray());
+	           
+	        } catch (ClientProtocolException e) {
+	            // TODO Auto-generated catch block
+	        } catch (IOException e) {
+	            // TODO Auto-generated catch block
+	        }
+	    }
+		
+		
 		// get image result from server and display it in result view
 		void getResultImage(HttpURLConnection conn) {
 			// retrieve the response from server
