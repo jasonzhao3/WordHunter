@@ -14,6 +14,8 @@ import android.view.WindowManager;
 
 public class SnapWordActivity extends Activity {
 
+	static int SNAP_MODE = 1;
+	
 	private Preview mPreview;
 	private LabelOnTop mLabelOnTop;
 	
@@ -35,7 +37,7 @@ public class SnapWordActivity extends Activity {
 		// Create our DrawOnTop view.
 		mLabelOnTop = new LabelOnTop(this);
 		// SnapMode: modeFlag = true
-		mPreview = new Preview(this, mLabelOnTop, 1, message);
+		mPreview = new Preview(this, mLabelOnTop, SNAP_MODE, message);
 	
 		setContentView(mPreview);
 		addContentView(mLabelOnTop, new LayoutParams(LayoutParams.WRAP_CONTENT,

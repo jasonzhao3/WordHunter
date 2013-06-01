@@ -12,8 +12,11 @@
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
-	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" >
+    </uses-permission>
 
     <application
         android:allowBackup="true"
@@ -32,6 +35,13 @@
         <activity
             android:name="com.ee368project.wordhunter.SnapWordActivity"
             android:label="@string/title_activity_snap_word" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.ee368project.wordhunter.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.ee368project.wordhunter.ScanWordActivity"
+            android:label="@string/title_activity_scan_word" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.ee368project.wordhunter.MainActivity" />

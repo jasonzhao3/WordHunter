@@ -30,13 +30,12 @@ public class MainActivity extends Activity {
 
 	/** Called when the user clicks the Scan button */
 	public void scanWord(View view) {
-		// Do something in response to button
-		// Hide the window title and set full screen
-		// Intent intent = new Intent(this, WordHunterActivity.class);
-		// EditText editText = (EditText) findViewById(R.id.edit_message);
-		// String message = editText.getText().toString();
-		// intent.putExtra(EXTRA_MESSAGE, message);
-		// startActivity(intent);
+		Intent intent = new Intent(this, ScanWordActivity.class);
+		EditText editText = (EditText) findViewById(R.id.edit_message);
+		String message = editText.getText().toString();
+		// putExtra: first parameter: key, second parameter: value
+		intent.putExtra(WORD_TO_SEARCH, message);
+		startActivity(intent);
 	}
 
 	public void snapWord(View view) {
@@ -50,5 +49,7 @@ public class MainActivity extends Activity {
 		startActivity(intent);
 
 	}
+	
+	
 
 }

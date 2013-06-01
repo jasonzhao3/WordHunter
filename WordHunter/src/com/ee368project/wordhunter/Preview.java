@@ -1,7 +1,5 @@
 package com.ee368project.wordhunter;
 
-
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -54,9 +52,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	Camera mCamera;
 	LabelOnTop mLabelOnTop;
 
-	boolean mFocusFlag;
 	int mModeFlag;
-	boolean mFinished;
+	boolean mFocusFlag;
 	String wordToSearch;
 
 	private Context mContext;
@@ -76,7 +73,6 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		super(context);
 		mContext = context;
 		mLabelOnTop = labelOnTop;
-		mFinished = false;
 		mFocusFlag = false;
 		mModeFlag = modeFlag;
 		wordToSearch = message;
@@ -120,13 +116,9 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		// register a auto-focus call back
 		mAutoFocusCallback = new Camera.AutoFocusCallback() {
 			public void onAutoFocus(boolean success, Camera camera) {
-				if (mFocusFlag == false)
+				Log.d(TAG, "I'm already in the onAutoFocus callback");
+				if (success == true && mFocusFlag == false)
 					mFocusFlag = true;
-				// SnapWord Mode: modeFlag == true
-				// if (mModeFlag == true) {
-				// camera.takePicture(mShutterCallback, mRawCallback,
-				// mJpegCallback);
-				// }
 
 			}
 		};
@@ -143,7 +135,22 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			mCamera.setPreviewCallback(new PreviewCallback() {
 				  // Called for each frame previewed
 		        public void onPreviewFrame(byte[] data, Camera camera) {  // <11>
-		           Preview.this.invalidate();  // <12>
+		        //   Preview.this.invalidate();  // <12>
+		        	try {
+						Thread.sleep(500);
+						if (mFocusFlag == true && mModeFlag == ScanWordActivity.SCAN_MODE) {
+							compressByteImage(mContext, data, 75);  				
+		  						  				//** Send image and offload image processing task  to server by starting async task ** 
+							ServerTask task = new ServerTask();
+							task.execute( Environment.getExternalStorageDirectory().toString() +INPUT_IMG_FILENAME);
+							//start the camera view again .
+							camera.startPreview();  
+						}
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		        	
 		        }
 		      });
 		   
@@ -154,15 +161,17 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			// onKeyDown function???
 			this.setOnTouchListener(new OnTouchListener() {
 				public boolean onTouch(View v, MotionEvent event) {
-					mFocusFlag = false;
-					// if (mLabelOnTop.mState == LabelOnTop.STATE_ORIGINAL) {
-					// mLabelOnTop.mState = LabelOnTop.STATE_PROCESSED;
-					// } else if (mLabelOnTop.mState ==
-					// LabelOnTop.STATE_PROCESSED) {
-					// mLabelOnTop.mState = LabelOnTop.STATE_ORIGINAL;
-					// }
-					mCamera.takePicture(mShutterCallback, mRawCallback,
+					if ( mModeFlag == SnapWordActivity.SNAP_MODE) {
+						mCamera.takePicture(mShutterCallback, mRawCallback,
 							mJpegCallback);
+					} else if (mFocusFlag == true) {
+						//do something in Scan_mode
+					} else {
+						mCamera.takePicture(mShutterCallback, mRawCallback,
+								mJpegCallback);
+						Log.d(TAG, "Cannot set up onAutoFocus");
+					}
+					//mFocusFlag = false;
 					return false;
 				}
 			});
@@ -178,8 +187,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		// Now that the size is known, set up the camera parameters and begin
 		// the preview.
 		Camera.Parameters parameters = mCamera.getParameters();
-		parameters.setPreviewSize(960, 1280);
-		parameters.setPictureSize(960, 1280);
+		parameters.setPreviewSize(960, 640);
+		parameters.setPictureSize(1280, 960);
 		List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
 		Log.d(LOG_TAG, "hello everybody\n");
 		
@@ -197,7 +206,6 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		// Surface will be destroyed when we return, so stop the preview.
 		// Because the CameraDevice object is not a shared resource, it's very
 		// important to release it when the activity is paused.
-		mFinished = true;
 		mCamera.setPreviewCallback(null);
 		mCamera.stopPreview();
 		mCamera.release();
@@ -238,32 +246,6 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		return true;
 	}
 
-	// onKeyDown is used to monitor button pressed and facilitate the autofocus
-	// and taking snap
-	@Override
-	public boolean onKeyDown(int keycode, KeyEvent event) {
-		// check if the camera button is pressed
-		if (keycode == KeyEvent.KEYCODE_CAMERA) {
-			// if SnapMode -- why the state variable cannot be used here??
-//			if (mModeFlag == 1 && mLabelOnTop.mState == 1) {
-//				mLabelOnTop.mState = 0;
-//			} else if (mModeFlag == 1 && mFocusFlag == false) {
-//				mCamera.takePicture(mShutterCallback, mRawCallback,
-//						mJpegCallback);
-//			}
-			mCamera.takePicture(mShutterCallback, mRawCallback,
-					mJpegCallback);
-			// no matter what mode, whenever the user touch the screen,
-			// set the focusFlag to false, to enable refocus
-			mFocusFlag = false;
-			return true;
-		}
-		return super.onKeyDown(keycode, event);
-	}
-
-	
-
-	
 
 	/**
 	 * Inner class -- ServerTask, used to upload the image file to the server
@@ -407,7 +389,9 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		// Main code for processing image algorithm on the server
 
 		void processImage(String inputImageFilePath) {
-			publishProgress(UPLOADING_PHOTO_STATE);
+			if (mModeFlag == SnapWordActivity.SNAP_MODE)
+				publishProgress(UPLOADING_PHOTO_STATE);
+			
 			File inputFile = new File(inputImageFilePath);
 			try {
 
@@ -430,8 +414,10 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		}
 
 		protected void onPreExecute() {
-			this.dialog.setMessage("Photo captured");
-			this.dialog.show();
+			if (mModeFlag == SnapWordActivity.SNAP_MODE) {
+				this.dialog.setMessage("Photo captured");
+				this.dialog.show();
+			}
 		}
 
 		@Override
@@ -440,22 +426,24 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			String uploadFilePath = params[0];
 			processImage(uploadFilePath);
 			// release camera when previous image is processed
-			mFocusFlag = true;
+			//mFocusFlag = true;
 			return null;
 		}
 
 		// progress update, display dialogs
 		@Override
 		protected void onProgressUpdate(Integer... progress) {
-			if (progress[0] == UPLOADING_PHOTO_STATE) {
-				dialog.setMessage("Uploading");
-				dialog.show();
-			} else if (progress[0] == SERVER_PROC_STATE) {
-				if (dialog.isShowing()) {
-					dialog.dismiss();
+			if (mModeFlag == SnapWordActivity.SNAP_MODE) {
+				if (progress[0] == UPLOADING_PHOTO_STATE) {
+					dialog.setMessage("Uploading");
+					dialog.show();
+				} else if (progress[0] == SERVER_PROC_STATE) {
+					if (dialog.isShowing()) {
+						dialog.dismiss();
+					}
+					dialog.setMessage("Processing");
+					dialog.show();
 				}
-				dialog.setMessage("Processing");
-				dialog.show();
 			}
 		}
 

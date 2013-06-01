@@ -10,5 +10,6 @@
     <string name="title_activity_word_hunter">WordHunterActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_snap_word">SnapWordActivity</string>
+    <string name="title_activity_scan_word">ScanWordActivity</string>
 
 </resources>
