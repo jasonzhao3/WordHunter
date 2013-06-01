@@ -35,7 +35,7 @@ public class SnapWordActivity extends Activity {
 		String message = intent.getStringExtra(MainActivity.WORD_TO_SEARCH);
 		// Create our Preview view and set it as the content of our activity.
 		// Create our DrawOnTop view.
-		mLabelOnTop = new LabelOnTop(this);
+		mLabelOnTop = new LabelOnTop(this, SNAP_MODE);
 		// SnapMode: modeFlag = true
 		mPreview = new Preview(this, mLabelOnTop, SNAP_MODE, message);
 	

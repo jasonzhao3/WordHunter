@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -16,35 +17,26 @@ public class LabelOnTop extends View {
 	Bitmap mBitmap;
 	Paint mPaintRed;
 	Paint mPaintYellow;
-	byte[] mYUVData;
-	int[] mRGBData;
-	int mImageWidth, mImageHeight;
-	int[] mGrayHistogram;
-	double[] mGrayCDF;
+	String mResultString;
+	
 	//mState = 0
 	int mState;
 
 
-	static final int STATE_ORIGINAL = 0;
-	static final int STATE_SNAP_MODE = 1;
-	static final int STATE_SCAN_MODE = 2;
-
-	public LabelOnTop(Context context) {
+	private static final String TAG = "Android Debug Log: LabelOnTop";
+	
+	
+	public LabelOnTop(Context context, int modeState) {
 		super(context);
 		
-		mState = STATE_ORIGINAL;
+		mState = modeState;
 
 		mPaintRed = new Paint();
 		mPaintRed.setStyle(Paint.Style.FILL);
 		mPaintRed.setColor(Color.RED);
 		mPaintRed.setTextSize(25);
-
-
 		mBitmap = null;
-		mYUVData = null;
-		mRGBData = null;
-		mGrayHistogram = new int[256];
-		mGrayCDF = new double[256];
+		
 	
 	}
 
@@ -54,8 +46,9 @@ public class LabelOnTop extends View {
 	// describe the colors and styles for the drawing).
 	@Override
 	protected void onDraw(Canvas canvas) {
+		Log.d(TAG, "enter onDraw");
 		//Snap mode
-		if (mState == 1 && mBitmap != null)
+		if (mState == SnapWordActivity.SNAP_MODE && mBitmap != null)
 		{
 			//get result image size
 			Rect src = new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
@@ -65,52 +58,11 @@ public class LabelOnTop extends View {
 			
 			//draw the bitmap
 			canvas.drawBitmap(mBitmap, src, dst, mPaintRed);
+		} else if (mState == ScanWordActivity.SCAN_MODE && mResultString != null) {
+			Log.d(TAG, "Successfully get the result string from the server!");
+			Log.d(TAG, "ResultString: " + mResultString);
 		}
-//		if (mBitmap != null) {
-//			int canvasWidth = canvas.getWidth();
-//			int canvasHeight = canvas.getHeight();
-//			int newImageWidth = 640;
-//			int newImageHeight = 480;
-//			int marginWidth = (canvasWidth - newImageWidth) / 2;
-//
-//			// Draw result image
-//			if (mState == STATE_ORIGINAL) {
-//				
-//			}
-//			else if (mState == STATE_SNAP_MODE) {
-//				// Draw bitmap
-//				Rect src = new Rect(0, 0, mImageWidth, mImageHeight);
-//				Rect dst = new Rect(marginWidth, 0, canvasWidth - marginWidth,
-//						canvasHeight);
-//				canvas.drawBitmap(mBitmap, src, dst, mPaintRed);
-//			} else { //STATE_SCAN_MODE
-//				return;  
-//			}
-//
-//			
-//			// Draw label
-//			String imageStateStr;
-//			if (mState == STATE_ORIGINAL)
-//				imageStateStr = "Original Image";
-//			else if (mState == STATE_SNAP_MODE)
-//				imageStateStr = "Processed Image";
-//			else 
-//				imageStateStr = "Scan Mode";
-//			
-//			canvas.drawText(imageStateStr, marginWidth + 10 - 1, 30 - 1,
-//					mPaintRed);
-//			canvas.drawText(imageStateStr, marginWidth + 10 + 1, 30 - 1,
-//					mPaintRed);
-//			canvas.drawText(imageStateStr, marginWidth + 10 + 1, 30 + 1,
-//					mPaintRed);
-//			canvas.drawText(imageStateStr, marginWidth + 10 - 1, 30 + 1,
-//					mPaintRed);
-//			canvas.drawText(imageStateStr, marginWidth + 10, 30, mPaintRed);
-//
-//		} // end if statement
-//
-//		super.onDraw(canvas);
-
+		
 	} // end onDraw method
 
 	

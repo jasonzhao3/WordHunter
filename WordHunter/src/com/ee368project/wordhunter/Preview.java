@@ -1,7 +1,7 @@
 package com.ee368project.wordhunter;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,20 +9,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.ByteArrayBuffer;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -36,7 +27,6 @@ import android.hardware.Camera.ShutterCallback;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -135,7 +125,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			mCamera.setPreviewCallback(new PreviewCallback() {
 				  // Called for each frame previewed
 		        public void onPreviewFrame(byte[] data, Camera camera) {  // <11>
-		        //   Preview.this.invalidate();  // <12>
+		           
 		        	try {
 						Thread.sleep(500);
 						if (mFocusFlag == true && mModeFlag == ScanWordActivity.SCAN_MODE) {
@@ -145,6 +135,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 							task.execute( Environment.getExternalStorageDirectory().toString() +INPUT_IMG_FILENAME);
 							//start the camera view again .
 							camera.startPreview();  
+						} else if (mModeFlag == SnapWordActivity.SNAP_MODE){
+							Preview.this.invalidate();  // <12>
 						}
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
@@ -335,40 +327,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		}
 
-		 void postData(String wordToSearch){  
-	        // Create a new HttpClient and Post Header
-	        HttpClient httpclient = new DefaultHttpClient();
-	        HttpPost httppost = new HttpPost("http://www.yourdomain.com/post.php");  
-	 
-	        try {
-	            // Add your data
-	            List nameValuePairs = new ArrayList(1);
-	            nameValuePairs.add(new BasicNameValuePair("data1", "dataValue"));
-	            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
-	 
-	            // Execute HTTP Post Request
-	            HttpResponse response = httpclient.execute(httppost);
-	 
-	            InputStream is = response.getEntity().getContent();
-	            BufferedInputStream bis = new BufferedInputStream(is);
-	            ByteArrayBuffer baf = new ByteArrayBuffer(20);
-	 
-	            int current = 0;
-	             
-	            while((current = bis.read()) != -1){
-	                baf.append((byte)current);
-	            }  
-	 
-	            /* Convert the Bytes read to a String. */
-	            wordToSearch = new String(baf.toByteArray());
-	           
-	        } catch (ClientProtocolException e) {
-	            // TODO Auto-generated catch block
-	        } catch (IOException e) {
-	            // TODO Auto-generated catch block
-	        }
-	    }
-		
+				
 		
 		// get image result from server and display it in result view
 		void getResultImage(HttpURLConnection conn) {
@@ -385,7 +344,37 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				e.printStackTrace();
 			}
 		}
-
+		
+		void getResultString(HttpURLConnection conn) {
+			try {
+				int rc = conn.getResponseCode();
+				if (rc == 200) {
+					Log.d(TAG, "response code correct");
+					BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+	                StringBuilder sb = new StringBuilder();
+	                mLabelOnTop.mResultString =sb.toString();
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Log.d(TAG, "successfully get the response string in Preview");
+		
+//			InputStream is;
+//			try {
+//				is = conn.getInputStream();
+//				// get result image from server
+//				mLabelOnTop.mResultString = getString(is);
+//				is.close();
+//				mLabelOnTop.mState = 1; //STATE_SNAP_MODE
+//			} catch (IOException e) {
+//				Log.e(TAG, e.toString());
+//				e.printStackTrace();
+//			}
+		}
+		
+		
 		// Main code for processing image algorithm on the server
 
 		void processImage(String inputImageFilePath) {
@@ -404,6 +393,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				// get processed photo from server
 				if (conn != null) {
 					getResultImage(conn);
+					getResultString(conn);
 				}
 				fileInputStream.close();
 			} catch (FileNotFoundException ex) {
@@ -419,6 +409,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				this.dialog.show();
 			}
 		}
+		
+		
 
 		@Override
 		protected Void doInBackground(String... params) { // background
