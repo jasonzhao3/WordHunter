@@ -59,19 +59,8 @@ public class SnapWordActivity extends Activity {
 	public boolean onKeyDown(int keycode, KeyEvent event) {
 		// check if the camera button is pressed
 		if (keycode == KeyEvent.KEYCODE_CAMERA) {
-			// if SnapMode -- why the state variable cannot be used here??
-//			if (mModeFlag == 1 && mLabelOnTop.mState == 1) {
-//				mLabelOnTop.mState = 0;
-//			} else if (mModeFlag == 1 && mFocusFlag == false) {
-//				mCamera.takePicture(mShutterCallback, mRawCallback,
-//						mJpegCallback);
-//			}
-			mPreview.mCamera.takePicture(mPreview.mShutterCallback, mPreview.mRawCallback,
-					mPreview.mJpegCallback);
-			// no matter what mode, whenever the user touch the screen,
-			// set the focusFlag to false, to enable refocus
-			mPreview.mFocusFlag = false;
-			return true;
+			mPreview.mPreviewMode = false;
+			return false;
 		}
 		return super.onKeyDown(keycode, event);
 	}

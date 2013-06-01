@@ -44,7 +44,9 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 
 	int mModeFlag;
 	boolean mFocusFlag;
+	boolean mPreviewMode;
 	String wordToSearch;
+	
 
 	private Context mContext;
 
@@ -64,6 +66,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		mContext = context;
 		mLabelOnTop = labelOnTop;
 		mFocusFlag = false;
+		mPreviewMode = false;
 		mModeFlag = modeFlag;
 		wordToSearch = message;
 		// Install a SurfaceHolder.Callback so we get notified when the
@@ -71,7 +74,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		mHolder = getHolder();
 		mHolder.addCallback(this);
 		mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-
+		
 		// register shuttercallback
 		mShutterCallback = new ShutterCallback() {
 			public void onShutter() {
@@ -135,8 +138,10 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 							task.execute( Environment.getExternalStorageDirectory().toString() +INPUT_IMG_FILENAME);
 							//start the camera view again .
 							camera.startPreview();  
+					
 						} else if (mModeFlag == SnapWordActivity.SNAP_MODE){
 							Preview.this.invalidate();  // <12>
+							//mPreviewMode = false;
 						}
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
@@ -153,9 +158,13 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			// onKeyDown function???
 			this.setOnTouchListener(new OnTouchListener() {
 				public boolean onTouch(View v, MotionEvent event) {
-					if ( mModeFlag == SnapWordActivity.SNAP_MODE) {
+					if (mModeFlag == SnapWordActivity.SNAP_MODE && mPreviewMode == false) {
+						mCamera.startPreview();
+						mPreviewMode = true;
+						Log.d(TAG, "mPreviewMode is false now");	
+					} else if ( mModeFlag == SnapWordActivity.SNAP_MODE) {
 						mCamera.takePicture(mShutterCallback, mRawCallback,
-							mJpegCallback);
+								mJpegCallback);
 					} else if (mFocusFlag == true) {
 						//do something in Scan_mode
 					} else {
@@ -163,6 +172,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 								mJpegCallback);
 						Log.d(TAG, "Cannot set up onAutoFocus");
 					}
+					
 					//mFocusFlag = false;
 					return false;
 				}
@@ -192,6 +202,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 //		parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
 		mCamera.setParameters(parameters);
 		mCamera.startPreview();
+		mPreviewMode = true;
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder) {
