@@ -32,20 +32,47 @@ For example, we want to search for “nonlinear equation” in this page of pape
 \end{figure}
 
 \section{Preprocessing}
-include sample image (original)
 \subsection{Binarization}
 
-First step is to enhance the image by histogram equalization, which can be done by calling OpenCV function equalizeHist.  The idea is to achieve uniform distribution of gray level in the image, without changing the relative brightness of the image. (i.e. if pixel A is brighter than pixel B in the original image, A will still be brighter than B in the histogram-equalized image)
+The first step is to apply an adaptive thresholding algorithm in order to separate text from background in a grayscale image (which can be derived from RGB).  The reason we choose adaptive thresholding instead of global thresholding is that the lighting/brightness of the image is not uniform which will cause global thresholding to perform poorly in the extreme bright/dark regions.  We also observed that a blockSize of 41 yields the best thresholding result.  See Figure~\ref{noskew} and Figure~\ref{noskewbinarized} for an example of image before and after binarization.
 
-The second step is to use an adaptive thresholding algorithm to separate text from background.  The reason we choose adaptive thresholding instead of global thresholding is that the lighting/brightness of the image is not uniform which will cause global thresholding to perform poorly in the extreme bright/dark regions.  We also observed that blocksize=25 yields the best thresholding result.
+\begin{figure}
+\center
+\includegraphics[scale=0.25]{no_skew.jpg}
+\caption{Before Binarization}
+\label{noskew}
+\end{figure}
 
-include sample image after binarization
+\begin{figure}
+\center
+\includegraphics[scale=0.25]{no_skew_binarized.jpg}
+\caption{After Binarization}
+\label{noskewbinarized}
+\end{figure}
 
 \subsection{De-skew}
 
-include sample image after de-skew.
+Hough transform is used to detect (text) lines in the image, we use OpenCV function HoughLinesP.  Then we rotate binarized image by the mean of the rotation angles calculated from each text line, we call OpenCV function getRotationMatrix2D to do it.  We also need to make sure not to cut off corners in the rotation process, therefore we need to pad the binarized image before rotating.  See Figure~\ref{binarized} and Figure~\ref{deskewed} for an example of image before and after de-skew.  Notice that Figure~\ref{deskewed} is slightly larger because of padding.
+
+\begin{figure}
+\center
+\includegraphics[scale=0.15]{binarized.jpg}
+\caption{Binarized Image Before Deskew}
+\label{binarized}
+\end{figure}
+
+\begin{figure}
+\center
+\includegraphics[scale=0.15]{deskewedImage.jpg}
+\caption{Binarized And Deskewed}
+\label{deskewed}
+\end{figure}
+
 
 \subsection{Layout analysis}
+
+Find CharSize, Find Neighbour, FindDist.
+
 
 \section{Word Recognition}
 
