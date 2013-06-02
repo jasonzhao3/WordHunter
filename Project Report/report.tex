@@ -34,7 +34,11 @@ For example, we want to search for “nonlinear equation” in this page of pape
 \section{Preprocessing}
 \subsection{Binarization}
 
-The first step is to apply an adaptive thresholding algorithm in order to separate text from background in a grayscale image (which can be derived from RGB).  The reason we choose adaptive thresholding instead of global thresholding is that the lighting/brightness of the image is not uniform which will cause global thresholding to perform poorly in the extreme bright/dark regions.  We also observed that a blockSize of 41 yields the best thresholding result.  See Figure~\ref{noskew} and Figure~\ref{noskewbinarized} for an example of image before and after binarization.
+The first step is to apply locally adaptive thresholding algorithm in order to separate text from background in a grayscale image (which can be derived from RGB).  The reason we choose locally adaptive thresholding instead of global thresholding is that the lighting/brightness of the image is not uniform which will cause global thresholding to perform poorly in the extreme bright/dark regions.
+
+The idea of locally adaptive thresholding is divide the image into blocks/windows.  For each block, use grayscale variance to determine whether the block is uniform.  If the block is non-uniform (high variance), apply Otsu's method/global thresholding to the block; if the block is uniform (low variance), classify the entire block as all black or all white based on the mean grayscale value.  The reason not to apply Otsu's method to every block is because some blocks maybe entirely background with a number of noise pixels, Ostu's method will keep the noise pixels while classifying the entire block as background will eliminate noise.
+
+We applied OpenCV function adaptiveThreshold for binarization.  We also observed that a blockSize of 41 yields the best thresholding result.  See Figure~\ref{noskew} and Figure~\ref{noskewbinarized} for an example of image before and after binarization.
 
 \begin{figure}
 \center
@@ -52,7 +56,7 @@ The first step is to apply an adaptive thresholding algorithm in order to separa
 
 \subsection{De-skew}
 
-Hough transform is used to detect (text) lines in the image, we use OpenCV function HoughLinesP.  Then we rotate binarized image by the mean of the rotation angles calculated from each text line, we call OpenCV function getRotationMatrix2D to do it.  We also need to make sure not to cut off corners in the rotation process, therefore we need to pad the binarized image before rotating.  See Figure~\ref{binarized} and Figure~\ref{deskewed} for an example of image before and after de-skew.  Notice that Figure~\ref{deskewed} is slightly larger because of padding.
+Hough transform (OpenCV function HoughLinesP) is used to detect (text) lines in the image.  Then we rotate binarized image by the mean of the rotation angles calculated from each text line, we call OpenCV function getRotationMatrix2D to do it.  We also need to make sure not to cut off corners in the rotation process, therefore we need to pad the binarized image before rotating.  See Figure~\ref{binarized} and Figure~\ref{deskewed} for an example of image before and after de-skew.  Notice that Figure~\ref{deskewed} is slightly larger because of padding.
 
 \begin{figure}
 \center
@@ -68,13 +72,34 @@ Hough transform is used to detect (text) lines in the image, we use OpenCV funct
 \label{deskewed}
 \end{figure}
 
-
-\subsection{Layout analysis}
-
-Find CharSize, Find Neighbour, FindDist.
-
-
 \section{Word Recognition}
+
+\subsection{Segmentation By Letter}
+The first step of word recognition is to segment the image into rectangles each containing a letter.  Because most letters consists of one connected component in the image, we can draw a contour (OpenCV function findContours and drawContours) around each letter and then find a bounding box of each contour (OpenCV function boundingRect). See Figure~\ref{letterbbox} for an example of each letter surrounded by a rectangular bounding box.
+
+Some letters (for instance, lower case ``i'', ``j'') consists of two connected components, and hence will have two bounding boxes, but it doesn't affect the algorithm as they will get combined in the next step as we combine letter bounding boxes into word bounding boxes.  
+
+\begin{figure}
+\center
+\includegraphics[scale=0.15]{letter_with_bounding_box.jpg}
+\caption{Segmentation By Letter}
+\label{letterbbox}
+\end{figure}
+
+\subsection{Segmentation By Word}
+
+In this step, we need to combine neighbouring letter bounding boxes into a word bounding box, but there is no existing OpenCV functions that performs this task.  We implemented the three functions below in C++:
+
+\subsubsection{Find Character Size}
+We implemented function findCharSize to estimate the average height and width of each letter (or its bounding box).  
+
+\subsubsection{Find Neighbour}
+We implemented isNeighbour to determine where two letters are next to each other in the same word.
+
+\subsection{Tesseract}
+findEditDistance
+
+\section{Server Client Connection}
 
 \section{Conclusion}
 

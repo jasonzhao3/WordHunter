@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2012.9.8)  2 JUN 2013 00:49
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2012.9.8)  2 JUN 2013 13:49
 entering extended mode
 **report.tex
 ("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.tex"
@@ -187,34 +187,38 @@ Package pdftex.def Info: demo.jpg used on input line 30.
 <no_skew.jpg, id=2, 602.25pt x 803.0pt>
 File: no_skew.jpg Graphic file (type jpg)
  <use no_skew.jpg>
-Package pdftex.def Info: no_skew.jpg used on input line 41.
+Package pdftex.def Info: no_skew.jpg used on input line 45.
 (pdftex.def)             Requested size: 150.56212pt x 200.74951pt.
 
 <no_skew_binarized.jpg, id=3, 602.25pt x 803.0pt>
 File: no_skew_binarized.jpg Graphic file (type jpg)
  <use no_skew_binarized.jpg>
-Package pdftex.def Info: no_skew_binarized.jpg used on input line 48.
+Package pdftex.def Info: no_skew_binarized.jpg used on input line 52.
 (pdftex.def)             Requested size: 150.56212pt x 200.74951pt.
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [1{C:/Users/lz7/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
+[1{C:/Users/lz7/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
 
 
  <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/demo.jpg> <C:/Users/l
-z7/Documents/GitHub/WordHunter/Project Report/no_skew.jpg> <C:/Users/lz7/Docume
-nts/GitHub/WordHunter/Project Report/no_skew_binarized.jpg>]
+z7/Documents/GitHub/WordHunter/Project Report/no_skew.jpg>]
 <binarized.jpg, id=12, 803.0pt x 602.25pt>
 File: binarized.jpg Graphic file (type jpg)
  <use binarized.jpg>
-Package pdftex.def Info: binarized.jpg used on input line 59.
+Package pdftex.def Info: binarized.jpg used on input line 63.
 (pdftex.def)             Requested size: 120.4448pt x 90.33359pt.
 
 <deskewedImage.jpg, id=13, 1284.8pt x 1084.05pt>
 File: deskewedImage.jpg Graphic file (type jpg)
  <use deskewedImage.jpg>
-Package pdftex.def Info: deskewedImage.jpg used on input line 66.
+Package pdftex.def Info: deskewedImage.jpg used on input line 70.
 (pdftex.def)             Requested size: 192.71169pt x 162.60048pt.
+
+<letter_with_bounding_box.jpg, id=14, 1084.05pt x 1445.4pt>
+File: letter_with_bounding_box.jpg Graphic file (type jpg)
+
+<use letter_with_bounding_box.jpg>
+Package pdftex.def Info: letter_with_bounding_box.jpg used on input line 84.
+(pdftex.def)             Requested size: 162.60048pt x 216.80064pt.
 
 
 ** Conference Paper **
@@ -227,30 +231,27 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[2
-
- <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/binarized.jpg> <C:/Us
-ers/lz7/Documents/GitHub/WordHunter/Project Report/deskewedImage.jpg>]
-("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.aux")
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
- ) 
+[2 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/no_skew_binarized.j
+pg> <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/binarized.jpg> <C:
+/Users/lz7/Documents/GitHub/WordHunter/Project Report/deskewedImage.jpg> <C:/Us
+ers/lz7/Documents/GitHub/WordHunter/Project Report/letter_with_bounding_box.jpg
+>] ("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.aux") ) 
 Here is how much of TeX's memory you used:
- 1836 strings out of 494045
- 29076 string characters out of 3148394
- 83124 words of memory out of 3000000
- 5163 multiletter control sequences out of 15000+200000
+ 1842 strings out of 494045
+ 29247 string characters out of 3148394
+ 84132 words of memory out of 3000000
+ 5168 multiletter control sequences out of 15000+200000
  33007 words of font info for 62 fonts, out of 3000000 for 9000
  715 hyphenation exceptions out of 8191
- 27i,8n,19p,608b,242s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Program File
-s/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/font
-s/type1/urw/times/utmbi8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/time
-s/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (2 pages, 839641 bytes).
+ 27i,8n,19p,652b,242s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/
+Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Program Files/MiKT
+eX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type
+1/urw/times/utmbi8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmr
+8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
+Output written on report.pdf (2 pages, 1215306 bytes).
 PDF statistics:
- 31 PDF objects out of 1000 (max. 8388607)
+ 32 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 26 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 31 words of extra memory for PDF output out of 10000 (max. 10000000)
 
