@@ -189,8 +189,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		// Now that the size is known, set up the camera parameters and begin
 		// the preview.
 		Camera.Parameters parameters = mCamera.getParameters();
-		parameters.setPreviewSize(960, 640);
-		parameters.setPictureSize(1280, 960);
+		//parameters.setPreviewSize(960, 640);
+		//parameters.setPictureSize(1280, 960);
 		List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
 		Log.d(LOG_TAG, "hello everybody\n");
 		
@@ -199,7 +199,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		}
 		parameters.setPreviewFrameRate(15);
 //		parameters.setSceneMode(Camera.Parameters.SCENE_MODE_NIGHT);
-//		parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+		parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
 		mCamera.setParameters(parameters);
 		mCamera.startPreview();
 		mPreviewMode = true;

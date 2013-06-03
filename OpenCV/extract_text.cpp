@@ -430,3 +430,4 @@ static void deskewText(Mat & src, Mat & deskewedImg, Mat & color_src, Mat & colo
   imwrite("color_image_deskew.jpg", color_deskew);
 
 }
+
