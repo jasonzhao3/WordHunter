@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2012.9.8)  2 JUN 2013 13:49
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2012.9.8)  2 JUN 2013 20:31
 entering extended mode
 **report.tex
 ("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.tex"
@@ -219,6 +219,24 @@ File: letter_with_bounding_box.jpg Graphic file (type jpg)
 <use letter_with_bounding_box.jpg>
 Package pdftex.def Info: letter_with_bounding_box.jpg used on input line 84.
 (pdftex.def)             Requested size: 162.60048pt x 216.80064pt.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 100.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 100.
+ [2 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/no_skew_binarized.
+jpg> <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/binarized.jpg> <C
+:/Users/lz7/Documents/GitHub/WordHunter/Project Report/deskewedImage.jpg> <C:/U
+sers/lz7/Documents/GitHub/WordHunter/Project Report/letter_with_bounding_box.jp
+g>]
+<word_with_bounding_box.jpg, id=20, 1084.05pt x 1445.4pt>
+File: word_with_bounding_box.jpg Graphic file (type jpg)
+
+<use word_with_bounding_box.jpg>
+Package pdftex.def Info: word_with_bounding_box.jpg used on input line 120.
+(pdftex.def)             Requested size: 162.60048pt x 216.80064pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
 
 
 ** Conference Paper **
@@ -231,27 +249,28 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[2 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/no_skew_binarized.j
-pg> <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/binarized.jpg> <C:
-/Users/lz7/Documents/GitHub/WordHunter/Project Report/deskewedImage.jpg> <C:/Us
-ers/lz7/Documents/GitHub/WordHunter/Project Report/letter_with_bounding_box.jpg
->] ("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.aux") ) 
+[3 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/word_with_bounding_
+box.jpg>] ("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.aux"
+) ) 
 Here is how much of TeX's memory you used:
- 1842 strings out of 494045
- 29247 string characters out of 3148394
- 84132 words of memory out of 3000000
- 5168 multiletter control sequences out of 15000+200000
+ 1850 strings out of 494045
+ 29434 string characters out of 3148394
+ 84140 words of memory out of 3000000
+ 5175 multiletter control sequences out of 15000+200000
  33007 words of font info for 62 fonts, out of 3000000 for 9000
  715 hyphenation exceptions out of 8191
- 27i,8n,19p,652b,242s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/
-Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Program Files/MiKT
-eX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type
-1/urw/times/utmbi8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmr
-8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (2 pages, 1215306 bytes).
+ 27i,8n,19p,711b,242s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Program Fil
+es/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files/MiKTe
+X 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX 2.9/fon
+ts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1
+/public/amsfonts/cm/cmsy7.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/time
+s/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmbi8a.pfb><C:
+/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/Mi
+KTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
+Output written on report.pdf (3 pages, 1633359 bytes).
 PDF statistics:
- 32 PDF objects out of 1000 (max. 8388607)
+ 52 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 31 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 36 words of extra memory for PDF output out of 10000 (max. 10000000)
 
