@@ -55,6 +55,7 @@ public class LabelOnTop extends View {
 		//Snap mode
 		if (mState == SnapWordActivity.SNAP_MODE && mBitmap != null)
 		{
+			Log.d(TAG, "enter onDraw, Snap mode");
 			//get result image size
 			Rect src = new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
 			
@@ -64,8 +65,8 @@ public class LabelOnTop extends View {
 			//draw the bitmap
 			mPaintRed.setAlpha(255);
 			canvas.drawBitmap(mBitmap, src, dst, mPaintRed);
-		} else if (mState == ScanWordActivity.SCAN_MODE && mResultString != null) {
-     	
+		} else if (mState == ScanWordActivity.SCAN_MODE && mBitmap != null) {
+			Log.d(TAG, "enter onDraw, Scan mode");
 
         	
 

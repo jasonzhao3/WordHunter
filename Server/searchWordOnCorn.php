@@ -59,10 +59,14 @@ if(copy($_FILES['uploadedfile']['tmp_name'], $photo_upload_path)) {
 	
 	#<5>signal that the image is ready
 	$handle = fopen($photo_upload_indicator_path, 'w');
-  $photo_name_with_word = $photo_upload_path . $_GET['word'];
+	$handle1 = fopen('scratch', 'w');
+        $photo_name_with_word = $photo_upload_path .'?'.$_GET['word'];
+        $mode = $_GET['mode'];
 	fprintf($handle, '%s', $photo_name_with_word);
+	fprintf($handle1, '%s', $_SERVER['QUERY_STRING']);
   // fprintf($handle, '%s', $photo_upload_path);
 	fclose($handle);
+	fclose($handle1);
 	
 	#<6>wait until the result is ready
 	while (!file_exists($processed_photo_output_indicator_path))
@@ -72,8 +76,13 @@ if(copy($_FILES['uploadedfile']['tmp_name'], $photo_upload_path)) {
 	usleep(1000);
 	unlink($processed_photo_output_indicator_path);
 	
-  $processed_photo_output_path = '/afs/ir.stanford.edu/users/y/z/yzhao3/cgi-bin/ee368/output/result_image.jpg';
-  $processed_file_output_path = '/afs/ir.stanford.edu/users/y/z/yzhao3/cgi-bin/ee368/output/result_file.txt';
+   if (intval($mode) == 1) { #snap mode
+        $processed_photo_output_path = '/afs/ir.stanford.edu/users/s/h/shuol/cgi-bin/output/result_image.jpg';
+   } else if (intval($mode) == 2) {#scan mode
+        $processed_photo_output_path = '/afs/ir.stanford.edu/users/s/h/shuol/cgi-bin/output/bb_mask.jpg';
+   }
+        #$processed_photo_output_path = '/afs/ir.stanford.edu/users/s/h/shuol/cgi-bin/output/result_image.jpg';
+  $processed_file_output_path = '/afs/ir.stanford.edu/users/s/h/shuol/cgi-bin/output/result_file.txt';
 	#<7>stream processed photo to the client
 	streamFile($processed_photo_output_path, $downloadFileName,"application/octet-stream");
   //echo("try to echo something back");

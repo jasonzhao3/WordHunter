@@ -83,7 +83,7 @@ int main(int argc, char** argv)
    if (abs(angle_degrees) > ANGLE_THRESH) { 
           Mat bb_mask_inv;
           Mat bb_mask_inv_cropped; 
-          Mat bb_mask(color_deskew.rows, color_deskew.cols, CV_8UC3, Scalar(0,0,0));
+          Mat bb_mask(color_deskew.rows, color_deskew.cols, CV_8UC3, Scalar(255,255,255));
 
            //deskewedImage = bwImage;
 
@@ -128,9 +128,8 @@ int main(int argc, char** argv)
           bb_mask_inv_cropped = bb_mask_inv(crop_box);  	
           // output result
           //imwrite("result_image.jpg", resultImage);
-          imwrite("bb_mask_inv_cropped.jpg", bb_mask_inv_cropped);
+          imwrite("./output/bb_mask.jpg", bb_mask_inv_cropped);
           imwrite("color_deskew_inv.jpg", color_deskew_inv);
-          imwrite("result_image.jpg", color_deskew_inv_cropped);
           imwrite("./output/result_image.jpg", color_deskew_inv_cropped);
           imwrite("letter_with_bounding_box.jpg", letterWithBox);
           imwrite("word_with_bounding_box.jpg", wordWithBox);
@@ -174,8 +173,7 @@ int main(int argc, char** argv)
           searchAndLabelWord(resultImage, bb_mask, wordWithBox, bwImageForTess, boundRect, wordToSearch, widthLimit);
           // output result
           //imwrite("result_image.jpg", resultImage);
-          imwrite("bb_mask.jpg", bb_mask);
-          imwrite("result_image.jpg", resultImage);
+          imwrite("./output/bb_mask.jpg", bb_mask);
           imwrite("./output/result_image.jpg", resultImage);
           imwrite("letter_with_bounding_box.jpg", letterWithBox);
           imwrite("word_with_bounding_box.jpg", wordWithBox);
