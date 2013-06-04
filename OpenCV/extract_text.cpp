@@ -215,7 +215,7 @@ static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth)
   //two dx is because when the bounding box becomes a rectangule, the original dx will not work anymore
   //two rectangles intersect
   if ((rect1 & rect2).area() != 0 ) return true;
-  if ((dy < 0.45 * cHeight || dy1 < 0.28 * cHeight || dy2 < 0.32 * cHeight)  && (dx1 < 0.32 * cWidth || dx2 < 0.32 *cWidth)) return true;
+  if ((dy < 0.65 * cHeight || dy1 < 0.28 * cHeight || dy2 < 0.32 * cHeight)  && (dx1 < 0.32 * cWidth || dx2 < 0.32 *cWidth)) return true;
   else return false;
 }
 
@@ -258,7 +258,7 @@ static void mergeBoundRect(vector<Rect> & boundRect,int & index1, int & index2) 
 static void clearNullRect(vector<Rect> & boundRect, float & cArea){
   for (int i = 0; i < boundRect.size(); i++) {
       float area = boundRect[i].area();
-    if (area == 0 || area < 0.35 * cArea || area > 15 * cArea) {
+    if (area == 0 || area < 0.35 * cArea || area > 22 * cArea) {
       boundRect.erase(boundRect.begin() + i);
       --i;
     }
@@ -349,7 +349,7 @@ int Min(int dis1, int dis2, int dis3) {
 
 static bool withinLengthRange(Rect & rectBox, int & widthLimit) {
   float width = rectBox.width;
-  if (width > 0.65 * widthLimit && width < 1.2 * widthLimit) 
+  if (width > 0.65 * widthLimit && width < 1.7 * widthLimit) 
     return true;
   else 
     return false;
