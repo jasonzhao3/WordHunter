@@ -68,11 +68,11 @@ int main(int argc, char** argv)
   //copy the image, and parameters(i.e. size) set-up
   resultImage = image.clone();
   int numLetters = wordToSearch.length();
-  int blkSize = 25;
+  int blkSize = 51;
   
   // rgb2gray
   cvtColor(image, grayImage, CV_RGB2GRAY);
-  medianBlur(grayImage, filteredImage, 5);
+  medianBlur(grayImage, filteredImage, 3);
   //filteredImage = grayImage;
   // equalize the image
   equalizeHist(grayImage, equalImage);
@@ -186,17 +186,38 @@ int main(int argc, char** argv)
 }
 
 
+// static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth) {
+//   if (rect1.area() == 0 || rect2.area() == 0) return false;
+
+//   float dy1 = abs(rect1.tl().y - rect2.tl().y); //i and j's dot
+//   float dy2 = abs(rect1.br().y - rect2.br().y); //"al"'s problem
+//   float dx1 = abs(rect1.tl().x - rect2.br().x); //if rect2 is in front of rect1
+//   float dx2 = abs(rect1.br().x - rect2.tl().x);
+//   //two dx is because when the bounding box becomes a rectangule, the original dx will not work anymore
+//   //two rectangles intersect
+//   if ((rect1 & rect2).area() != 0 ) return true;
+//   if ((dy1 < 0.25 * cHeight || dy2 < 0.35 * cHeight) && (dx1 < 0.45 * cWidth || dx2 < 0.45 *cWidth)) return true;
+//   else return false;
+// }
+
+
 static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth) {
   if (rect1.area() == 0 || rect2.area() == 0) return false;
 
+  float y1 = (rect1.tl().y + rect1.br().y);
+  float y2 = (rect2.tl().y + rect2.br().y );
+  float dy = abs(y1 - y2) / 2;
+
   float dy1 = abs(rect1.tl().y - rect2.tl().y); //i and j's dot
   float dy2 = abs(rect1.br().y - rect2.br().y); //"al"'s problem
+
   float dx1 = abs(rect1.tl().x - rect2.br().x); //if rect2 is in front of rect1
   float dx2 = abs(rect1.br().x - rect2.tl().x);
+
   //two dx is because when the bounding box becomes a rectangule, the original dx will not work anymore
   //two rectangles intersect
   if ((rect1 & rect2).area() != 0 ) return true;
-  if ((dy1 < 0.25 * cHeight || dy2 < 0.35 * cHeight) && (dx1 < 0.45 * cWidth || dx2 < 0.45 *cWidth)) return true;
+  if ((dy < 0.45 * cHeight || dy1 < 0.28 * cHeight || dy2 < 0.32 * cHeight)  && (dx1 < 0.32 * cWidth || dx2 < 0.32 *cWidth)) return true;
   else return false;
 }
 
@@ -282,7 +303,8 @@ static int isMatch(string &sResult, string &wordToSearch) {
   //may need change to use edit distance
   int dis = findEditDistance(sResult, wordToSearch, (int)wordToSearch.length() * 0.3, 0);
   float ratio = (float) dis / wordToSearch.length();
-  cout << "Ratio between " << sResult << " and " << wordToSearch << " = " << dis << "/" <<wordToSearch.length() << " = " << ratio << endl;
+  // cout << "Ratio between " << sResult << " and " << wordToSearch << " = " << dis << "/" <<wordToSearch.length() << " = " << ratio << endl;
+  cout << "Ratio between " << sResult << " and " << wordToSearch << " = " <<  ratio << endl;
   if (dis == 0) {
           cout << " Match is red"<< endl;
           return 0;
