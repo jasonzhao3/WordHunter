@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 
@@ -18,6 +19,9 @@ public class LabelOnTop extends View {
 	Paint mPaintRed;
 	Paint mPaintYellow;
 	String mResultString;
+
+	
+
 	
 	//mState = 0
 	int mState;
@@ -28,13 +32,14 @@ public class LabelOnTop extends View {
 	
 	public LabelOnTop(Context context, int modeState) {
 		super(context);
-		
+		Log.d(TAG, "enter onDraw constructor");
 		mState = modeState;
 
 		mPaintRed = new Paint();
 		mPaintRed.setStyle(Paint.Style.FILL);
 		mPaintRed.setColor(Color.RED);
 		mPaintRed.setTextSize(25);
+		
 		mBitmap = null;
 		
 	
@@ -57,8 +62,23 @@ public class LabelOnTop extends View {
 			Rect dst=new Rect(0,0,canvas.getWidth(),canvas.getHeight());
 			
 			//draw the bitmap
+			mPaintRed.setAlpha(255);
 			canvas.drawBitmap(mBitmap, src, dst, mPaintRed);
 		} else if (mState == ScanWordActivity.SCAN_MODE && mResultString != null) {
+     	
+
+        	
+
+	        
+			
+			//get result image size
+			Rect src = new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+			
+			//get current screen size
+			Rect dst=new Rect(0,0,canvas.getWidth(),canvas.getHeight());
+			
+			mPaintRed.setAlpha(100);
+			canvas.drawBitmap(mBitmap, src, dst, mPaintRed);
 			Log.d(TAG, "Successfully get the result string from the server!");
 			Log.d(TAG, "ResultString: " + mResultString);
 		}

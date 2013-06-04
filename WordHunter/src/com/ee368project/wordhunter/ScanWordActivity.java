@@ -18,6 +18,8 @@ public class ScanWordActivity extends Activity {
 	private Preview mPreview;
 	private LabelOnTop mLabelOnTop;
 	final static int SCAN_MODE = 2;
+
+
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

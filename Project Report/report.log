@@ -1,7 +1,7 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2012.9.8)  29 MAY 2013 16:45
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2012.9.8)  2 JUN 2013 20:31
 entering extended mode
 **report.tex
-(C:\Users\lz7\Dropbox\EE368\report.tex
+("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.tex"
 LaTeX2e <2011/06/27>
 Babel <v3.8m> and hyphenation patterns for english, afrikaans, ancientgreek, ar
 abic, armenian, assamese, basque, bengali, bokmal, bulgarian, catalan, coptic, 
@@ -130,7 +130,7 @@ Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
 \Gin@req@height=\dimen117
 \Gin@req@width=\dimen118
 )
-(C:\Users\lz7\Dropbox\EE368\report.aux)
+("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.aux")
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 3.
 LaTeX Font Info:    ... okay on input line 3.
 LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 3.
@@ -184,6 +184,60 @@ File: demo.jpg Graphic file (type jpg)
 Package pdftex.def Info: demo.jpg used on input line 30.
 (pdftex.def)             Requested size: 216.80946pt x 145.66885pt.
 
+<no_skew.jpg, id=2, 602.25pt x 803.0pt>
+File: no_skew.jpg Graphic file (type jpg)
+ <use no_skew.jpg>
+Package pdftex.def Info: no_skew.jpg used on input line 45.
+(pdftex.def)             Requested size: 150.56212pt x 200.74951pt.
+
+<no_skew_binarized.jpg, id=3, 602.25pt x 803.0pt>
+File: no_skew_binarized.jpg Graphic file (type jpg)
+ <use no_skew_binarized.jpg>
+Package pdftex.def Info: no_skew_binarized.jpg used on input line 52.
+(pdftex.def)             Requested size: 150.56212pt x 200.74951pt.
+
+[1{C:/Users/lz7/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
+
+
+ <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/demo.jpg> <C:/Users/l
+z7/Documents/GitHub/WordHunter/Project Report/no_skew.jpg>]
+<binarized.jpg, id=12, 803.0pt x 602.25pt>
+File: binarized.jpg Graphic file (type jpg)
+ <use binarized.jpg>
+Package pdftex.def Info: binarized.jpg used on input line 63.
+(pdftex.def)             Requested size: 120.4448pt x 90.33359pt.
+
+<deskewedImage.jpg, id=13, 1284.8pt x 1084.05pt>
+File: deskewedImage.jpg Graphic file (type jpg)
+ <use deskewedImage.jpg>
+Package pdftex.def Info: deskewedImage.jpg used on input line 70.
+(pdftex.def)             Requested size: 192.71169pt x 162.60048pt.
+
+<letter_with_bounding_box.jpg, id=14, 1084.05pt x 1445.4pt>
+File: letter_with_bounding_box.jpg Graphic file (type jpg)
+
+<use letter_with_bounding_box.jpg>
+Package pdftex.def Info: letter_with_bounding_box.jpg used on input line 84.
+(pdftex.def)             Requested size: 162.60048pt x 216.80064pt.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 100.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 100.
+ [2 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/no_skew_binarized.
+jpg> <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/binarized.jpg> <C
+:/Users/lz7/Documents/GitHub/WordHunter/Project Report/deskewedImage.jpg> <C:/U
+sers/lz7/Documents/GitHub/WordHunter/Project Report/letter_with_bounding_box.jp
+g>]
+<word_with_bounding_box.jpg, id=20, 1084.05pt x 1445.4pt>
+File: word_with_bounding_box.jpg Graphic file (type jpg)
+
+<use word_with_bounding_box.jpg>
+Package pdftex.def Info: word_with_bounding_box.jpg used on input line 120.
+(pdftex.def)             Requested size: 162.60048pt x 216.80064pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -195,26 +249,28 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[1{C:/Users/lz7/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
-
-
- <C:/Users/lz7/Dropbox/EE368/demo.jpg>] (C:\Users\lz7\Dropbox\EE368\report.aux)
- ) 
+[3 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/word_with_bounding_
+box.jpg>] ("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.aux"
+) ) 
 Here is how much of TeX's memory you used:
- 1812 strings out of 494045
- 28441 string characters out of 3148394
- 82092 words of memory out of 3000000
- 5143 multiletter control sequences out of 15000+200000
+ 1850 strings out of 494045
+ 29434 string characters out of 3148394
+ 84140 words of memory out of 3000000
+ 5175 multiletter control sequences out of 15000+200000
  33007 words of font info for 62 fonts, out of 3000000 for 9000
  715 hyphenation exceptions out of 8191
- 27i,8n,19p,608b,242s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Program File
-s/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/font
-s/type1/urw/times/utmbi8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/time
-s/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (1 page, 77161 bytes).
+ 27i,8n,19p,711b,242s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Program Fil
+es/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files/MiKTe
+X 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX 2.9/fon
+ts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1
+/public/amsfonts/cm/cmsy7.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/time
+s/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmbi8a.pfb><C:
+/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/Mi
+KTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
+Output written on report.pdf (3 pages, 1633359 bytes).
 PDF statistics:
- 24 PDF objects out of 1000 (max. 8388607)
+ 52 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 36 words of extra memory for PDF output out of 10000 (max. 10000000)
 

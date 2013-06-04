@@ -32,27 +32,109 @@ For example, we want to search for “nonlinear equation” in this page of pape
 \end{figure}
 
 \section{Preprocessing}
-include sample image (original)
 \subsection{Binarization}
 
-First step is to enhance the image by histogram equalization, which can be done by calling OpenCV function equalizeHist.  The idea is to achieve uniform distribution of gray level in the image, without changing the relative brightness of the image. (i.e. if pixel A is brighter than pixel B in the original image, A will still be brighter than B in the histogram-equalized image)
+The first step is to apply locally adaptive thresholding algorithm in order to separate text from background in a grayscale image (which can be derived from RGB).  The reason we choose locally adaptive thresholding instead of global thresholding is that the lighting/brightness of the image is not uniform which will cause global thresholding to perform poorly in the extreme bright/dark regions.
 
-The second step is to use an adaptive thresholding algorithm to separate text from background.  The reason we choose adaptive thresholding instead of global thresholding is that the lighting/brightness of the image is not uniform which will cause global thresholding to perform poorly in the extreme bright/dark regions.  We also observed that blocksize=25 yields the best thresholding result.
+The idea of locally adaptive thresholding is divide the image into blocks/windows.  For each block, use grayscale variance to determine whether the block is uniform.  If the block is non-uniform (high variance), apply Otsu's method/global thresholding to the block; if the block is uniform (low variance), classify the entire block as all black or all white based on the mean grayscale value.  The reason not to apply Otsu's method to every block is because some blocks maybe entirely background with a number of noise pixels, Ostu's method will keep the noise pixels while classifying the entire block as background will eliminate noise.
 
-include sample image after binarization
+We applied OpenCV function adaptiveThreshold for binarization.  We also observed that a blockSize of 41 yields the best thresholding result.  See Figure~\ref{noskew} and Figure~\ref{noskewbinarized} for an example of image before and after binarization.
+
+\begin{figure}
+\center
+\includegraphics[scale=0.25]{no_skew.jpg}
+\caption{Before Binarization}
+\label{noskew}
+\end{figure}
+
+\begin{figure}
+\center
+\includegraphics[scale=0.25]{no_skew_binarized.jpg}
+\caption{After Binarization}
+\label{noskewbinarized}
+\end{figure}
 
 \subsection{De-skew}
 
-include sample image after de-skew.
+Hough transform (OpenCV function HoughLinesP) is used to detect (text) lines in the image.  Then we rotate binarized image by the mean of the rotation angles calculated from each text line, we call OpenCV function getRotationMatrix2D to do it.  We also need to make sure not to cut off corners in the rotation process, therefore we need to pad the binarized image before rotating.  See Figure~\ref{binarized} and Figure~\ref{deskewed} for an example of image before and after de-skew.  Notice that Figure~\ref{deskewed} is slightly larger because of padding.
 
-\subsection{Layout analysis}
+\begin{figure}
+\center
+\includegraphics[scale=0.15]{binarized.jpg}
+\caption{Binarized Image Before Deskew}
+\label{binarized}
+\end{figure}
+
+\begin{figure}
+\center
+\includegraphics[scale=0.15]{deskewedImage.jpg}
+\caption{Binarized And Deskewed}
+\label{deskewed}
+\end{figure}
 
 \section{Word Recognition}
+
+\subsection{Segmentation By Letter}
+The first step of word recognition is to segment the image into rectangles each containing a letter.  Because most letters consists of one connected component in the image, we can draw a contour (OpenCV function findContours and drawContours) around each letter and then find a bounding box of each contour (OpenCV function boundingRect). See Figure~\ref{letterbbox} for an example of each letter surrounded by a rectangular bounding box.
+
+Some letters (for instance, lower case ``i'', ``j'') consists of two connected components, and hence will have two bounding boxes, but it doesn't affect the algorithm since they will get combined in the next step as we combine letter bounding boxes into word bounding boxes.
+
+\begin{figure}
+\center
+\includegraphics[scale=0.15]{letter_with_bounding_box.jpg}
+\caption{Segmentation By Letter}
+\label{letterbbox}
+\end{figure}
+
+\subsection{Segmentation By Word}
+
+In this step, we need to combine neighbouring letter bounding boxes into a word bounding box, but there is no existing OpenCV functions that performs this task.  We implemented the following functions in C++:
+
+\subsubsection{Find Character Size}
+We implemented function findCharSize to estimate the average height and width of each letter (or its bounding box).  This is important because when deciding whether two letter bounding boxes are neighbours, we need to look at the distance between them relative to the average size of bounding boxes, making the decision based on absolute distance only is not accurate.
+
+The implementation was done by creating a map with keys being the areas of the bounding boxes, and the values being the frequencies (i.e. how many bounding boxes has area that equal to the key).  Then we pick the ten most frequent area values and calculate the mean.
+
+The function calculates the values for a few important parameters including:
+\begin{itemize}
+\item cArea: The mean calculated from the ten most frequent area values.
+\item cHeight: An estimate of average height of letters, calculated from $\sqrt{\mbox{cArea}}$ mutiplied by a constant factor to take into account that most letters have larger height than width.
+\item cWidth: An estimate of average width of letters, calculated from $\sqrt{\mbox{cArea}}$ multiplied by a constant factor to take into account that most letters have larger width than height.
+\end{itemize}
+
+\subsubsection{Find Neighbour}
+We implemented isNeighbour to determine whether two letters are next to each other in the same word.  This is the key logic in determining which letter bounding boxes to merge together into a word bounding box.  Two bounding boxes need to satisfy both conditions below in order to be called neighbours:
+\begin{itemize}
+\item The x-coordinate of the right edge of box 1 and the x-coordinate of the left edge of box 2 are off by at most $0.45 \times \mbox{cWidth}$ (box 1 is to the left of box 2); or vice versa, the x-coordinate of the left edge of box 1 and the x-coordinate of the right edge of box 2 are off by at most $0.45 \times \mbox{cWidth}$ (box 1 is to the right of box 2).  The factor 0.45 is the parameter that gives the best results after several experiments.
+\item  Because different letters have different heights, we decided to use the y-coordinate of the bottom edge to determine whether two boxes are on the same row.  The y-coordinates of the bottom edges of the two boxes needs to be within $0.35 \times \mbox{cHeight}$ of each other.
+
+In addition, we also want to combine the dot in lower case ``i'' and ``j'', therefore we allow the case where the y-coordinates of the top edges are within $0.25 \times \mbox{cHeight}$.
+
+The factors 0.35 and 0.25 are also parameters that are observed to give the best results after several experiments.
+\end{itemize}
+
+See Figure~\ref{wordbbox} for an example of segmentation by word.
+
+\begin{figure}
+\center
+\includegraphics[scale=0.15]{word_with_bounding_box.jpg}
+\caption{Segmentation By word}
+\label{wordbbox}
+\end{figure}
+
+\subsection{Search And Label Matches}
+At last we can pass each bounding box (hopefully containing exactly one word at this point) to the Tesseract OCR engine.  Sometimes the image is out of focus or blurry due to vibration, therefore the result from Tesseract is not accurate.  To cope with the imperfection, we label exact matches with a red rectangle, non-exact matches with blue or green rectangles.
+
+Exact or non-exact matches is determined by the ratio between edit distance (or Levenshtein distance) and the length of the keyword.  A ratio of exact zero (or edit distance equal to zero) means that there is an exact match.  A ratio reasonably close to zero means that we have a non-exact match.
+
+Levenshtein distance is defined to be the minimum number of single-letter operations (insertion, deletion or substitution) needed to transform one string into another.  For example, to change ``abcd'' into ``bcda'', one can either change each letter (change the first letter ``a'' to ``b'', the second letter ``b'' to ``c'', the third letter ``c'' to ``d'', the fourth letter ``d'' to ``a'' ), which has a total of four operations, or delete the ``a'' from the beginning of the string and add an ``a'' to the end of it, which has a total of two operations.  Therefore the Levenshtein distance between the two strings is two.  The distance can be calculated between any two strings using recursion.
+
+\section{Server Client Connection}
 
 \section{Conclusion}
 
 \section*{Acknowledgment}
-We would like to thank David Chen and Sam Tsai for their generous and responsive help on the project.
+We would like to thank David Chen and Sam Tsai for their generous and responsive help on the project.  We would also like to thank Professor Girod for his inspiring lectures.
 
 
 %\begin{thebibliography}{1}

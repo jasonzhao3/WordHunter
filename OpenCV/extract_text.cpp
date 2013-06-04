@@ -8,7 +8,7 @@
 using namespace cv;
 using namespace std;
 double const PAD = 0.4;
-
+float const ANGLE_THRESH = 5;
 
 #define TESS_DATA_CONFIG "alphanumeric"
 #define MAX_WORD_LENGTH 25
@@ -47,7 +47,7 @@ static vector<Rect> labelLettersWithBox(Mat &letterWithBox, vector<vector<Point>
 static void mergeBox(vector<Rect> & boundRect, int & cHeight, int & cWidth);
 static void searchAndLabelWord(Mat & resultImage, Mat & bb_mask, Mat & wordWithBox, Mat & bwImageForTess, \
                        vector<Rect> & boundRect, string & wordToSearch, int & widthLimit);
-static void deskewText(Mat & src, Mat & deskewedImg, Mat & color_src, Mat & color_deskew, Mat & rot_mat_inv, int & top, int & bottom, int & left, int & right);
+static void deskewText(Mat & src, Mat & deskewedImg, Mat & color_src, Mat & color_deskew, Mat & rot_mat_inv, int & top, int & bottom, int & left, int & right, double & angle_degrees);
 static int findEditDistance(const string str1, const string str2, int cutoff, int order);
 int Min(int dis1, int dis2, int dis3);
 
@@ -56,6 +56,7 @@ int main(int argc, char** argv)
   Mat image, grayImage, bwImage, equalImage, deskewedImage, wordWithBox, resultImage, filteredImage;
   Mat  color_deskew, color_deskew_inv, color_deskew_inv_cropped, rot_mat_inv;
   int top, bottom, left, right;
+  double angle_degrees;
   if (argc != 3) {
     printf("Incorrect input. Please enter: executable + imageFileName + wordToSearch\n");
     return -1;
@@ -71,69 +72,115 @@ int main(int argc, char** argv)
   
   // rgb2gray
   cvtColor(image, grayImage, CV_RGB2GRAY);
-  //medianBlur(grayImage, filteredImage, 5);
-  filteredImage = grayImage;
+  medianBlur(grayImage, filteredImage, 5);
+  //filteredImage = grayImage;
   // equalize the image
   equalizeHist(grayImage, equalImage);
   // gray2bw
   adaptiveThreshold(filteredImage, bwImage, 255, ADAPTIVE_THRESH_MEAN_C,\
 		    THRESH_BINARY_INV, blkSize, 10);
-  
-   deskewText(bwImage, deskewedImage, image, color_deskew, rot_mat_inv, top, bottom, left, right);
-   //deskewedImage = bwImage;
+  deskewText(bwImage, deskewedImage, image, color_deskew, rot_mat_inv, top, bottom, left, right, angle_degrees);
+   if (abs(angle_degrees) > ANGLE_THRESH) { 
+          Mat bb_mask_inv;
+          Mat bb_mask_inv_cropped; 
+          Mat bb_mask(color_deskew.rows, color_deskew.cols, CV_8UC3, Scalar(0,0,0));
 
-  Mat bb_mask(color_deskew.rows, color_deskew.cols, CV_8UC3, Scalar(0,0,0));
-  Mat bb_mask_inv;
-  Mat bb_mask_inv_cropped;
+           //deskewedImage = bwImage;
 
 
-  Mat bwImageForTess = deskewedImage.clone();
-  //add bounding box
-  cvtColor(deskewedImage, wordWithBox, CV_GRAY2RGB, 0);
 
-  vector<Vec4i> hierarchy;
-  vector<vector<Point> > contours;
-  Mat contourImage;
-  cvtColor(deskewedImage, contourImage, CV_GRAY2RGB, 0);  
-  //findContours(deskewedImage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-  findContours(deskewedImage, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
-   for (int i = 0; i < contours.size(); i++) {
-     drawContours(contourImage, contours, i, Scalar(255, 0, 0), 1, 8, hierarchy, 0, Point());
-   }
-   imwrite("contours.jpg", contourImage);
+          Mat bwImageForTess = deskewedImage.clone();
+          //add bounding box
+          cvtColor(deskewedImage, wordWithBox, CV_GRAY2RGB, 0);
 
-  Mat letterWithBox = wordWithBox.clone();
+          vector<Vec4i> hierarchy;
+          vector<vector<Point> > contours;
+          Mat contourImage;
+          cvtColor(deskewedImage, contourImage, CV_GRAY2RGB, 0);  
+          //findContours(deskewedImage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+          findContours(deskewedImage, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
+           for (int i = 0; i < contours.size(); i++) {
+             drawContours(contourImage, contours, i, Scalar(255, 0, 0), 1, 8, hierarchy, 0, Point());
+           }
+           imwrite("contours.jpg", contourImage);
 
-  vector<Rect> boundRect = labelLettersWithBox(letterWithBox, contours);
-  //imwrite("immediate_after_letter_label.jpg", letterWithBox);
-  // estimate the width and height of each character
-  int cHeight, cWidth, widthLimit;
-  float cArea;
-  findCharSize(boundRect, cHeight, cWidth, cArea, widthLimit, numLetters);
-  
-  // merge and then clear already merged rectangles, and too large and too-small regions
-  mergeBox(boundRect, cHeight, cWidth);
-  clearNullRect(boundRect, cArea);
+          Mat letterWithBox = wordWithBox.clone();
 
-  //searchAndLabelWord(resultImage, wordWithBox, bwImageForTess, boundRect, wordToSearch, widthLimit);
-  searchAndLabelWord(color_deskew, bb_mask, wordWithBox, bwImageForTess, boundRect, wordToSearch, widthLimit);
-  // Rotate the image and the bounding box back after it's been labeled
-  warpAffine(color_deskew, color_deskew_inv, rot_mat_inv, color_deskew.size(), INTER_LANCZOS4, BORDER_TRANSPARENT);
-  warpAffine(bb_mask, bb_mask_inv, rot_mat_inv, color_deskew.size(), INTER_LANCZOS4, BORDER_TRANSPARENT);
-  // remove the padding
-  Rect crop_box(left, top, image.cols, image.rows);
-  color_deskew_inv_cropped = color_deskew_inv(crop_box);  	
-  bb_mask_inv_cropped = bb_mask_inv(crop_box);  	
-  // output result
-  //imwrite("result_image.jpg", resultImage);
-  imwrite("bb_mask_inv_cropped.jpg", bb_mask_inv_cropped);
-  imwrite("color_deskew_inv.jpg", color_deskew_inv);
-  imwrite("result_image.jpg", color_deskew_inv_cropped);
-  imwrite("./output/result_image.jpg", color_deskew_inv_cropped);
-  imwrite("letter_with_bounding_box.jpg", letterWithBox);
-  imwrite("word_with_bounding_box.jpg", wordWithBox);
+          vector<Rect> boundRect = labelLettersWithBox(letterWithBox, contours);
+          //imwrite("immediate_after_letter_label.jpg", letterWithBox);
+          // estimate the width and height of each character
+          int cHeight, cWidth, widthLimit;
+          float cArea;
+          findCharSize(boundRect, cHeight, cWidth, cArea, widthLimit, numLetters);
+          
+          // merge and then clear already merged rectangles, and too large and too-small regions
+          mergeBox(boundRect, cHeight, cWidth);
+          clearNullRect(boundRect, cArea);
+
+          //searchAndLabelWord(resultImage, wordWithBox, bwImageForTess, boundRect, wordToSearch, widthLimit);
+          searchAndLabelWord(color_deskew, bb_mask, wordWithBox, bwImageForTess, boundRect, wordToSearch, widthLimit);
+          // Rotate the image and the bounding box back after it's been labeled
+          warpAffine(color_deskew, color_deskew_inv, rot_mat_inv, color_deskew.size(), INTER_LANCZOS4, BORDER_TRANSPARENT);
+          warpAffine(bb_mask, bb_mask_inv, rot_mat_inv, color_deskew.size(), INTER_LANCZOS4, BORDER_TRANSPARENT);
+          // remove the padding
+          Rect crop_box(left, top, image.cols, image.rows);
+          color_deskew_inv_cropped = color_deskew_inv(crop_box);  	
+          bb_mask_inv_cropped = bb_mask_inv(crop_box);  	
+          // output result
+          //imwrite("result_image.jpg", resultImage);
+          imwrite("bb_mask_inv_cropped.jpg", bb_mask_inv_cropped);
+          imwrite("color_deskew_inv.jpg", color_deskew_inv);
+          imwrite("result_image.jpg", color_deskew_inv_cropped);
+          imwrite("./output/result_image.jpg", color_deskew_inv_cropped);
+          imwrite("letter_with_bounding_box.jpg", letterWithBox);
+          imwrite("word_with_bounding_box.jpg", wordWithBox);
+  } else {
+          Mat bb_mask_inv;
+          Mat bb_mask_inv_cropped; 
+          Mat bb_mask(bwImage.rows, bwImage.cols, CV_8UC3, Scalar(0,0,0));
+
+           //deskewedImage = bwImage;
+
+
+
+          Mat bwImageForTess = bwImage.clone();
+          //add bounding box
+          cvtColor(bwImage, wordWithBox, CV_GRAY2RGB, 0);
+
+          vector<Vec4i> hierarchy;
+          vector<vector<Point> > contours;
+          Mat contourImage;
+          cvtColor(bwImage, contourImage, CV_GRAY2RGB, 0);  
+          //findContours(bwImage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+          findContours(bwImage, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
+//           for (int i = 0; i < contours.size(); i++) {
+//             drawContours(contourImage, contours, i, Scalar(255, 0, 0), 1, 8, hierarchy, 0, Point());
+//           }
+//           imwrite("contours.jpg", contourImage);
+
+          Mat letterWithBox = wordWithBox.clone();
+
+          vector<Rect> boundRect = labelLettersWithBox(letterWithBox, contours);
+          //imwrite("immediate_after_letter_label.jpg", letterWithBox);
+          // estimate the width and height of each character
+          int cHeight, cWidth, widthLimit;
+          float cArea;
+          findCharSize(boundRect, cHeight, cWidth, cArea, widthLimit, numLetters);
+          
+          // merge and then clear already merged rectangles, and too large and too-small regions
+          mergeBox(boundRect, cHeight, cWidth);
+          clearNullRect(boundRect, cArea);
+
+          searchAndLabelWord(resultImage, bb_mask, wordWithBox, bwImageForTess, boundRect, wordToSearch, widthLimit);
+          // output result
+          //imwrite("result_image.jpg", resultImage);
+          imwrite("bb_mask.jpg", bb_mask);
+          imwrite("result_image.jpg", resultImage);
+          imwrite("./output/result_image.jpg", resultImage);
+          imwrite("letter_with_bounding_box.jpg", letterWithBox);
+          imwrite("word_with_bounding_box.jpg", wordWithBox);
+  }
   printf("image saved successfully.\n");
-  printf("Please only look at word_with_bounding_box.jpg for the solution\n");
   waitKey(0);
   return 0;
 }
@@ -235,11 +282,19 @@ static int isMatch(string &sResult, string &wordToSearch) {
   //may need change to use edit distance
   int dis = findEditDistance(sResult, wordToSearch, (int)wordToSearch.length() * 0.3, 0);
   float ratio = (float) dis / wordToSearch.length();
-  cout << ratio << endl;
   cout << "Ratio between " << sResult << " and " << wordToSearch << " = " << dis << "/" <<wordToSearch.length() << " = " << ratio << endl;
-  if (dis == 0) return 0;
-  else if (ratio < 0.25 && dis > 0 ) return 1;
-  else if (ratio < 0.43 && dis > 0 ) return 2;
+  if (dis == 0) {
+          cout << " Match is red"<< endl;
+          return 0;
+  }
+  else if (ratio < 0.25 && dis > 0 ) {
+          cout << " Match is blue"<< endl;
+          return 1;
+  }
+  else if (ratio < 0.43 && dis > 0 ) {
+          cout << " Match is green"<< endl;
+          return 2;
+  }
   //0.6667 is a super inacurate threshold
   else return -1;
 }
@@ -309,11 +364,13 @@ static void searchAndLabelWord(Mat & resultImage, Mat & bb_mask, Mat & wordWithB
   int rectNum = boundRect.size();
   Scalar color = Scalar(0,0,255);
   for (int i = 0; i < rectNum; i++) {
-      if (withinLengthRange(boundRect[i], widthLimit)) {
+      if (1) {
+      //if (withinLengthRange(boundRect[i], widthLimit)) {
         Mat wordWindow(bwImageForTess, boundRect[i]);
         Mat wordWindowWithPadding = addPadding(wordWindow);
         //string wordWindowName = "word_" + to_string(i) + ".jpg";
         //imwrite(wordWindowName, wordWindowWithPadding);
+        //string sResult = textRecognition(wordWindow);
         string sResult = textRecognition(wordWindowWithPadding);
         //writeFile(sResult);
         
@@ -336,15 +393,19 @@ static void searchAndLabelWord(Mat & resultImage, Mat & bb_mask, Mat & wordWithB
            rectangle(bb_mask, boundRect[i], Scalar(0, 255, 0), 4, 8, 0);
           }
         }
+//      ostringstream convert; 
+//      convert << i;
+//      string fileNum = convert.str();
+//      string fileName = "bounding" + fileNum + ".jpg";    
+//      imwrite(fileName, wordWindowWithPadding);
       }
-      
       rectangle(wordWithBox, boundRect[i], color, 1, 8, 0);
   }
 }
 
 
 
-static void deskewText(Mat & src, Mat & deskewedImg, Mat & color_src, Mat & color_deskew, Mat & rot_mat_inv, int & top, int & bottom, int & left, int & right)
+static void deskewText(Mat & src, Mat & deskewedImg, Mat & color_src, Mat & color_deskew, Mat & rot_mat_inv, int & top, int & bottom, int & left, int & right, double & angle_degrees)
 {
   int threshold_value = 0;
   int threshold_type = THRESH_BINARY;;
@@ -356,7 +417,6 @@ static void deskewText(Mat & src, Mat & deskewedImg, Mat & color_src, Mat & colo
   
   Mat adapt_img = src;
   Mat adapt_img_padded;
-  Mat after_erode;
   Mat deskewedImg_blurred;
   Mat color_src_padded;
   /// Load an image
@@ -383,7 +443,6 @@ static void deskewText(Mat & src, Mat & deskewedImg, Mat & color_src, Mat & colo
 
   Mat disp_lines(size, CV_8UC1, Scalar(0, 0, 0));
   double angle = 0.;
-  double angle_degrees = 0.;
   unsigned nb_lines = lines.size();
   for (unsigned i = 0; i < nb_lines; ++i)
   {
@@ -394,40 +453,42 @@ static void deskewText(Mat & src, Mat & deskewedImg, Mat & color_src, Mat & colo
   angle /= nb_lines; // mean angle, in radians.
   angle_degrees = angle * 180/CV_PI; // mean angle, in radians.
 
-  printf ("angle is %f\n", angle_degrees); 
-  //imshow("Hough Lines", disp_lines);
+  if (abs(angle_degrees) > ANGLE_THRESH) {
+          printf ("angle is %f, need deskew\n", angle_degrees); 
+          //imshow("Hough Lines", disp_lines);
 
-  // Compute the bounding box of the entire text:
-  vector<Point> points;
-  Mat_<uchar>::iterator it = adapt_img_padded.begin<uchar>();
-  Mat_<uchar>::iterator end = adapt_img_padded.end<uchar>();
-  for (; it != end; ++it) {
-    if (*it) {
-      points.push_back(it.pos());
-    }
+          // Compute the bounding box of the entire text:
+          vector<Point> points;
+          Mat_<uchar>::iterator it = adapt_img_padded.begin<uchar>();
+          Mat_<uchar>::iterator end = adapt_img_padded.end<uchar>();
+          for (; it != end; ++it) {
+            if (*it) {
+              points.push_back(it.pos());
+            }
+          }
+          RotatedRect box = minAreaRect(Mat(points));
+          Mat rot_mat = getRotationMatrix2D(box.center, angle_degrees, 1);
+          invertAffineTransform(rot_mat, rot_mat_inv);
+          std::cout << "rotation matrix = " << std::endl << " " << rot_mat << std::endl << std::endl;
+
+          Mat se = getStructuringElement(MORPH_ELLIPSE, Size(3,3));  
+          Mat color_deskew_inv; 
+          //warpAffine(adapt_img, deskewedImg_blurred, rot_mat, adapt_img.size(), INTER_LANCZOS4, BORDER_TRANSPARENT);
+          //warpAffine(color_src, color_deskew, rot_mat, color_src.size(), INTER_LANCZOS4, BORDER_TRANSPARENT);
+          warpAffine(adapt_img_padded, deskewedImg_blurred, rot_mat, adapt_img_padded.size(), INTER_LANCZOS4, BORDER_TRANSPARENT);
+          warpAffine(color_src_padded, color_deskew, rot_mat, color_src_padded.size(), INTER_LANCZOS4, BORDER_TRANSPARENT);
+
+          std::cout << box.center.x << ", " << box.center.y << std::endl;
+          //imshow("after deskew", deskewedImg);
+          threshold(deskewedImg_blurred, deskewedImg, 128, 255, THRESH_BINARY);
+          // waitKey(0);
+          imwrite("color_src_padded.jpg", color_src_padded);
+          imwrite("src_image.jpg", src);
+          imwrite("deskewed_image.jpg", deskewedImg);
+          imwrite("color_image_deskew.jpg", color_deskew);
+  } else {
+          cout << "angle is " << angle_degrees << " No need for deskew"<< endl;
   }
-  RotatedRect box = minAreaRect(Mat(points));
-  Mat rot_mat = getRotationMatrix2D(box.center, angle_degrees, 1);
-  invertAffineTransform(rot_mat, rot_mat_inv);
-  std::cout << "rotation matrix = " << std::endl << " " << rot_mat << std::endl << std::endl;
-
-  Mat se = getStructuringElement(MORPH_ELLIPSE, Size(3,3));  
-  Mat color_deskew_inv; 
-  erode(adapt_img_padded, after_erode, se);
-  //warpAffine(after_erode, deskewedImg, rot_mat, adapt_img_padded.size(), INTER_CUBIC);
-  //warpAffine(adapt_img, deskewedImg_blurred, rot_mat, adapt_img.size(), INTER_LANCZOS4, BORDER_TRANSPARENT);
-  //warpAffine(color_src, color_deskew, rot_mat, color_src.size(), INTER_LANCZOS4, BORDER_TRANSPARENT);
-  warpAffine(adapt_img_padded, deskewedImg_blurred, rot_mat, adapt_img_padded.size(), INTER_LANCZOS4, BORDER_TRANSPARENT);
-  warpAffine(color_src_padded, color_deskew, rot_mat, color_src_padded.size(), INTER_LANCZOS4, BORDER_TRANSPARENT);
-
-  std::cout << box.center.x << ", " << box.center.y << std::endl;
-  //imshow("after deskew", deskewedImg);
-  threshold(deskewedImg_blurred, deskewedImg, 128, 255, THRESH_BINARY);
-  // waitKey(0);
-  imwrite("color_src_padded.jpg", color_src_padded);
-  imwrite("src_image.jpg", src);
-  imwrite("deskewed_image.jpg", deskewedImg);
-  imwrite("color_image_deskew.jpg", color_deskew);
 
 }
 
