@@ -6,8 +6,8 @@ while (True):
 	# % Wait until image is ready
     imageReadyFile = './upload/image_ready';
     if not os.path.exists(imageReadyFile): 
-        time.sleep(0.5);
-        #print('Waiting for image-is-ready signal');
+        time.sleep(0.3);
+        print('Waiting for image-is-ready signal');
         continue;
     
     # % Read input image file
@@ -20,10 +20,8 @@ while (True):
     pathStr = root[:lastSlash];
     name = root[lastSlash+1 :];
 
-    wordToSearch = ext.split('?')[1];
-    #mode = ext.split('?')[2];
+    wordToSearch = ext.split('jpg')[1];
     print("the word to search is : " + wordToSearch);
-    #print("mode is : " + mode);
 
 
     # [pathStr, name, ext] = fileparts(imageFile);
@@ -38,13 +36,13 @@ while (True):
     # end
 
     inputImageFile = './upload/' + name + '.jpg';
-    outputImageFile = './output/processed_' + name + '.jpg';
+    #outputImageFile = './output/processed_' + name + '.jpg';
 # %     
 # %     img = imread(inputImageFile);
 # %     img_histogram = imhist(img);
 # %     imwrite(img_histogram, outputImageFile);
 
-    cmd = './extract_text ' + inputImageFile + ' ' + wordToSearch;
+    cmd = './extract_text/extract_text ' + inputImageFile + ' ' + wordToSearch;
     os.system(cmd);
     
     # % Signal that result is ready
