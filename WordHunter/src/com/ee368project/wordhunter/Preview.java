@@ -48,7 +48,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	boolean mPreviewMode;
 	String wordToSearch;
 	int scanState;
-
+	
 
 	private Context mContext;
 
@@ -58,21 +58,34 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	Camera.AutoFocusCallback mAutoFocusCallback;
 	int scanModeProcessing;
 
-	private final String SERVERURL = "http://www.stanford.edu/~yzhao3/cgi-bin/ee368/searchWordOnCorn.php";
-//	private final String SERVERURL = "http://www.stanford.edu/~shuol/cgi-bin/searchWordOnCorn.php";
+//	private final String SERVERURL = "http://www.stanford.edu/~yzhao3/cgi-bin/ee368/searchWordOnCorn.php";
+	private final String SERVERURL = "http://www.stanford.edu/~shuol/cgi-bin/searchWordOnCorn.php";
 	// name for storing image captured by camera view
 	private final static String INPUT_IMG_FILENAME = "/temp.jpg";
 	static int SCAN_INIT = 0;
-	static int SCAN_AUTOFOCUS = 1;
-	static int SCAN_PROCESS = 2;
+	static int SCAN_AUTOFOCUS_BEGIN = 1;
+	static int SCAN_AUTOFOCUS_IN_PROGRESS = 2;
+	static int SCAN_PROCESS_BEGIN = 3;
+	static int SCAN_PROCESS_IN_PROGRESS = 4;
+	//Jason's camera
+	//static int mWidthPreview = 960;
+	//static int mHeightPreview = 640;
+	//static int mWidthPicture = 1280;
+	//static int mHeightPicture = 960;
+	//Shuo's camera
+	static int mWidthPreview = 1024;
+	static int mHeightPreview = 768;
+	static int mWidthPicture = 1024;
+	static int mHeightPicture = 768;
+	
 	private static final String TAG = "WordHunterPreviewClass";
 	private static final String LOG_TAG = "Android Debug Log";
-
+	
 
 	Preview(Context context, LabelOnTop labelOnTop, int modeFlag, String message) {
-
+		
 		super(context);
-		scanState = SCAN_AUTOFOCUS;
+		scanState = SCAN_AUTOFOCUS_BEGIN;
 		mContext = context;
 		mLabelOnTop = labelOnTop;
 		mFocusFlag = false;
@@ -86,7 +99,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		mHolder.addCallback(this);
 		mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		Log.d(TAG, "entering Preview constructor");
-
+		
 		// register shuttercallback
 		mShutterCallback = new ShutterCallback() {
 			public void onShutter() {
@@ -104,8 +117,12 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		// Define jpeg callback
 		mJpegCallback = new PictureCallback() {
 			public void onPictureTaken(byte[] data, Camera camera) {
+				Log.d(TAG, "Picture callback");
 //				Intent mIntent = new Intent();
   				//compress image
+				if (mModeFlag == ScanWordActivity.SCAN_MODE) {
+					scanState = SCAN_PROCESS_IN_PROGRESS;
+				}
   				compressByteImage(mContext, data, 75);  				
 //  				setResult(0, mIntent);
   				
@@ -128,7 +145,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				} else if (mModeFlag == ScanWordActivity.SCAN_MODE) {
 					camera.takePicture(mShutterCallback, mRawCallback,
 							mJpegCallback);
-  					scanState = SCAN_PROCESS;
+  					scanState = SCAN_PROCESS_BEGIN;
 				}
 				if (success == true && mFocusFlag == false)
 					mFocusFlag = true;
@@ -137,7 +154,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		};
 	}
 
-
+	
 	public void surfaceCreated(SurfaceHolder holder) {
 		mCamera = Camera.open();
 		try {
@@ -147,41 +164,54 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			// available
 			mCamera.setPreviewCallback(new PreviewCallback() {
 				  // Called for each frame previewed
+			
 		        public void onPreviewFrame(byte[] data, Camera camera) {  // <11>
 		        	Log.d(TAG, "Entered onPreviewFrame");
+		        	if (scanState == SCAN_AUTOFOCUS_BEGIN) {
+						Log.d(TAG, "in onPreviewFrame, state = SCAN_AUTOFOCUS_BEGIN");
+					}else if (scanState == SCAN_AUTOFOCUS_IN_PROGRESS) {
+						Log.d(TAG, "in onPreviewFrame, state = SCAN_AUTOFOCUS_IN_PROGRESS");
+					}else if (scanState == SCAN_PROCESS_BEGIN) {
+						Log.d(TAG, "in onPreviewFrame, state = SCAN_PROCESS_BEGIN");
+					} else if (scanState == SCAN_PROCESS_IN_PROGRESS) {
+						Log.d(TAG, "in onPreviewFrame, state = SCAN_PROCESS_IN_PROGRESS");
+					}
 		        	try {
 						Thread.sleep(500);
-						if (mFocusFlag == true && mModeFlag == ScanWordActivity.SCAN_MODE) {
+						/*if (mFocusFlag == true && mModeFlag == ScanWordActivity.SCAN_MODE) {
 							compressByteImage(mContext, data, 75);  				
 		  						  				//** Send image and offload image processing task  to server by starting async task ** 
 							ServerTask task = new ServerTask();
 							task.execute( Environment.getExternalStorageDirectory().toString() +INPUT_IMG_FILENAME);
 							//start the camera view again .
 							camera.startPreview();  
-
-						} else if (mModeFlag == SnapWordActivity.SNAP_MODE){
+					
+						}*/
+						if (mModeFlag == SnapWordActivity.SNAP_MODE){
+							//Force a draw
 							Preview.this.invalidate();  // <12>
 							//mPreviewMode = false;
 						} else if (mModeFlag == ScanWordActivity.SCAN_MODE) {
-							if (scanState == SCAN_AUTOFOCUS) {
+							Preview.this.invalidate();
+							if (scanState == SCAN_AUTOFOCUS_BEGIN) {
 								mCamera.autoFocus(mAutoFocusCallback);
-							} else if (scanState == SCAN_PROCESS) {
-
-								//start the camera view again .
-
+								scanState = SCAN_AUTOFOCUS_IN_PROGRESS;
+							} else if (scanState == SCAN_PROCESS_BEGIN) {
+								
+								//compressByteImage(mContext, data, 75);  	
 								//camera.startPreview();  
 							}
-
+							
 
 						}
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-
+		        	
 		        }
 		      });
-
+		   
 
 
 			// Define on touch listener
@@ -204,7 +234,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 								mJpegCallback);
 						Log.d(TAG, "Cannot set up onAutoFocus");
 					}
-
+					
 					//mFocusFlag = false;
 					return false;
 				}
@@ -216,27 +246,32 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		}
 
 	}
-
+	
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		// Now that the size is known, set up the camera parameters and begin
 		// the preview.
 		Camera.Parameters parameters = mCamera.getParameters();
-		//Jason's camera
-//		parameters.setPreviewSize(960, 640);
-		parameters.setPictureSize(1280, 960);
 
-		//Shuo's camera
-//		parameters.setPictureSize(1024, 768);
-		List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
+		
+		//parameters.setPictureSize(mWidthPicture, mHeightPicture);
+		//parameters.setPreviewSize(mWidthPreview, mHeightPreview);
+		parameters.setPictureSize(1024, 768);
+		//parameters.setPreviewSize(1024, 768);
+		List<Camera.Size> picSizes = parameters.getSupportedPictureSizes();
+		List<Camera.Size> previewSize = parameters.getSupportedPreviewSizes();
 		Log.d(LOG_TAG, "hello everybody\n");
 		List<String> focusModes = parameters.getSupportedFocusModes();
-
-		for (Camera.Size size : sizes) {
-			Log.d(LOG_TAG, "supported camerasize: height: " + size.height + " width:  " + size.width);
+		
+		for (Camera.Size size : picSizes) {
+			Log.d(LOG_TAG, "supported picture size: height: " + size.height + " width:  " + size.width);
+		}
+		for (Camera.Size size : picSizes) {
+			Log.d(LOG_TAG, "supported preview size: height: " + size.height + " width:  " + size.width);
 		}
 		for (String mode : focusModes) {
 			Log.d(LOG_TAG, "supported focus modes: " + mode);
 		}
+		Log.d(LOG_TAG, "Picture format is " + parameters.getPictureFormat());
 		parameters.setPreviewFrameRate(15);
 //		parameters.setSceneMode(Camera.Parameters.SCENE_MODE_NIGHT);
 		parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
@@ -244,7 +279,33 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		mCamera.startPreview();
 		mPreviewMode = true;
 	}
-
+	
+    /*static public void decodeYUV420SP(int[] rgb, byte[] yuv420sp, int width, int height) {
+    	final int frameSize = width * height;
+    	
+    	for (int j = 0, yp = 0; j < height; j++) {
+    		int uvp = frameSize + (j >> 1) * width, u = 0, v = 0;
+    		for (int i = 0; i < width; i++, yp++) {
+    			int y = (0xff & ((int) yuv420sp[yp])) - 16;
+    			if (y < 0) y = 0;
+    			if ((i & 1) == 0) {
+    				v = (0xff & yuv420sp[uvp++]) - 128;
+    				u = (0xff & yuv420sp[uvp++]) - 128;
+    			}
+    			
+    			int y1192 = 1192 * y;
+    			int r = (y1192 + 1634 * v);
+    			int g = (y1192 - 833 * v - 400 * u);
+    			int b = (y1192 + 2066 * u);
+    			
+    			if (r < 0) r = 0; else if (r > 262143) r = 262143;
+    			if (g < 0) g = 0; else if (g > 262143) g = 262143;
+    			if (b < 0) b = 0; else if (b > 262143) b = 262143;
+    			
+    			rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
+    		}
+    	}
+    }*/
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		// Surface will be destroyed when we return, so stop the preview.
 		// Because the CameraDevice object is not a shared resource, it's very
@@ -254,7 +315,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		mCamera.release();
 		mCamera = null;
 	}
-
+	
 	// store the image as a jpeg image
 	public boolean compressByteImage(Context mContext, byte[] imageData,
 			int quality) {
@@ -269,11 +330,21 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		try {
 			BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inSampleSize = 1; // no downsampling
-			Bitmap myImage = BitmapFactory.decodeByteArray(imageData, 0,
+			Bitmap myImage = null;
+			/*int[] rgbArray = null;
+			if (mModeFlag == SnapWordActivity.SNAP_MODE) {
+				myImage = BitmapFactory.decodeByteArray(imageData, 0,
+						imageData.length, options);
+			} else if (mModeFlag == ScanWordActivity.SCAN_MODE) {
+				decodeYUV420SP(rgbArray, imageData, mWidthPreview,  mHeightPreview);
+				myImage = BitmapFactory.decodeByteArray(rgbArray, 0,
+						imageData.length, options);
+			}*/
+			 myImage = BitmapFactory.decodeByteArray(imageData, 0,
 					imageData.length, options);
 			fileOutputStream = new FileOutputStream(sdCard.toString()
 					+ INPUT_IMG_FILENAME);
-
+			Log.d(TAG, "Image length is " + Integer.toString(imageData.length));
 			BufferedOutputStream bos = new BufferedOutputStream(
 					fileOutputStream);
 
@@ -290,7 +361,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		} catch (IOException e) {
 			Log.e(TAG, "IOException");
 			e.printStackTrace();
-		}
+		} 
 		return true;
 	}
 
@@ -322,7 +393,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			final String boundary = "*****";
 
 			try {
-				String urlString = SERVERURL + "?word=" + wordToSearch;
+				String urlString = SERVERURL + "?word=" + wordToSearch + "&mode=" + Integer.toString(mModeFlag);
 				Log.d(TAG, urlString);
 				URL url = new URL(urlString);
 				// Open a HTTP connection to the URL
@@ -383,11 +454,12 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		}
 
-
-
+				
+		
 		// get image result from server and display it in result view
 		void getResultImage(HttpURLConnection conn) {
 			// retrieve the response from server
+			Log.d(TAG, "getResultImage");
 			InputStream is;
 			try {
 				is = conn.getInputStream();
@@ -396,13 +468,13 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				is.close();
 				//mLabelOnTop.mState = 1; //STATE_SNAP_MODE
 				mLabelOnTop.mState = mModeFlag;
-				scanState = SCAN_AUTOFOCUS;
+				scanState = SCAN_AUTOFOCUS_BEGIN;
 			} catch (IOException e) {
 				Log.e(TAG, e.toString());
 				e.printStackTrace();
 			}
 		}
-
+		
 		void getResultString(HttpURLConnection conn) {
 			try {
 				int rc = conn.getResponseCode();
@@ -412,13 +484,13 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	                StringBuilder sb = new StringBuilder();
 	                mLabelOnTop.mResultString =sb.toString();
 				}
-
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			Log.d(TAG, "successfully get the response string in Preview");
-
+		
 //			InputStream is;
 //			try {
 //				is = conn.getInputStream();
@@ -431,8 +503,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 //				e.printStackTrace();
 //			}
 		}
-
-
+		
+		
 		// Main code for processing image algorithm on the server
 
 		void processImage(String inputImageFilePath) {
@@ -442,8 +514,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			} else if (mModeFlag == ScanWordActivity.SCAN_MODE) {
 				Log.d(TAG, "Entering process image, SCAN mode");
 			}
-
-
+				
+			
 			File inputFile = new File(inputImageFilePath);
 			try {
 
@@ -472,8 +544,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				this.dialog.show();
 			}
 		}
-
-
+		
+		
 
 		@Override
 		protected Void doInBackground(String... params) { // background
