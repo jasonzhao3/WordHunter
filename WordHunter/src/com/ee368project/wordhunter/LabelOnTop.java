@@ -17,15 +17,10 @@ import android.view.View;
 public class LabelOnTop extends View {
 	Bitmap mBitmap;
 	Paint mPaintRed;
-	Paint mPaintYellow;
-	String mResultString;
+	Paint mPaintTransparent;
 
-	
-
-	
-	//mState = 0
-	int mState;
-
+	int mCanvasState;
+	static final int CLEAR = -1;
 
 	private static final String TAG = "Android Debug Log: LabelOnTop";
 	
@@ -33,13 +28,15 @@ public class LabelOnTop extends View {
 	public LabelOnTop(Context context, int modeState) {
 		super(context);
 		Log.d(TAG, "enter onDraw constructor");
-		mState = modeState;
+		mCanvasState = modeState;
 
 		mPaintRed = new Paint();
 		mPaintRed.setStyle(Paint.Style.FILL);
 		mPaintRed.setColor(Color.RED);
 		mPaintRed.setTextSize(25);
 		
+		mPaintTransparent = new Paint();
+		mPaintTransparent.setAlpha(0);
 		mBitmap = null;
 		
 	
@@ -53,38 +50,32 @@ public class LabelOnTop extends View {
 	protected void onDraw(Canvas canvas) {
 		Log.d(TAG, "enter onDraw");
 		//Snap mode
-		if (mState == SnapWordActivity.SNAP_MODE && mBitmap != null)
+		if (mCanvasState == SnapWordActivity.SNAP_MODE && mBitmap != null)
 		{
 			Log.d(TAG, "enter onDraw, Snap mode");
 			//get result image size
 			Rect src = new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
-			
 			//get current screen size
 			Rect dst=new Rect(0,0,canvas.getWidth(),canvas.getHeight());
-			
 			//draw the bitmap
 			mPaintRed.setAlpha(255);
 			canvas.drawBitmap(mBitmap, src, dst, mPaintRed);
-		} else if (mState == ScanWordActivity.SCAN_MODE && mBitmap != null) {
+		} else if (mCanvasState == ScanWordActivity.SCAN_MODE && mBitmap != null) {
 			Log.d(TAG, "enter onDraw, Scan mode");
-
-        	
-
-	        
-			
 			//get result image size
 			Rect src = new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
-			
 			//get current screen size
 			Rect dst=new Rect(0,0,canvas.getWidth(),canvas.getHeight());
-			
-			mPaintRed.setAlpha(100);
+			mPaintRed.setAlpha(150);
 			canvas.drawBitmap(mBitmap, src, dst, mPaintRed);
-			Log.d(TAG, "Successfully get the result string from the server!");
-			Log.d(TAG, "ResultString: " + mResultString);
+		} else if (mCanvasState == CLEAR) {
+			canvas.drawPaint(mPaintTransparent);
 		}
 		
 	} // end onDraw method
 
+	public void setCanvasState(int canvasState) {
+		mCanvasState = canvasState;
+	}
 	
 }

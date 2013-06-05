@@ -57,10 +57,16 @@ public class SnapWordActivity extends Activity {
 	
 	@Override
 	public boolean onKeyDown(int keycode, KeyEvent event) {
-		// check if the camera button is pressed
-		if (keycode == KeyEvent.KEYCODE_CAMERA) {
-			mPreview.mPreviewMode = false;
+		// check if the search button or menu button is pressed 
+		// two keys => increase compatibility
+		//search button starts the search by taking a snapshot
+		if (keycode == KeyEvent.KEYCODE_SEARCH || keycode == KeyEvent.KEYCODE_MENU) {
+			mPreview.mCamera.takePicture(mPreview.mShutterCallback, mPreview.mRawCallback,
+					mPreview.mJpegCallback);
 			return false;
+		//clear the drawingOnTop, restart the view
+		} else if (keycode == KeyEvent.KEYCODE_CAMERA) {
+			mLabelOnTop.setCanvasState(LabelOnTop.CLEAR);
 		}
 		return super.onKeyDown(keycode, event);
 	}
