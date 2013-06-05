@@ -14,6 +14,12 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 
+
+/**
+ * @author Yang Zhao
+ * 
+ */
+
 public class HunterGameActivity extends Activity {
 
 	private Preview mPreview;

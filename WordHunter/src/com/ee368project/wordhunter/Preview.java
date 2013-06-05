@@ -34,9 +34,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
-
 /**
- * @author Yang Zhao
+ * @author Yang Zhao & Shuo Liu
  * 
  */
 public class Preview extends SurfaceView implements SurfaceHolder.Callback {

@@ -11,7 +11,7 @@ import android.util.Log;
 import android.view.View;
 
 /**
- * @author Yang Zhao
+ * @author Yang Zhao & Shuo Liu
  * 
  */
 public class LabelOnTop extends View {

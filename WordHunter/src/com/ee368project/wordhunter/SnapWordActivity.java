@@ -12,6 +12,10 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 
+/**
+ * @author Yang Zhao
+ * 
+ */
 public class SnapWordActivity extends Activity {
 
 	static int SNAP_MODE = 1;
