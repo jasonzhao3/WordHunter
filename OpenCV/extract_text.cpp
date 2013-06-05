@@ -49,7 +49,7 @@ static void searchAndLabelWord(Mat & resultImage, Mat & bb_mask, Mat & wordWithB
                        vector<Rect> & boundRect, string & wordToSearch, int & widthLimit);
 static void deskewText(Mat & src, Mat & deskewedImg, Mat & color_src, Mat & color_deskew, Mat & rot_mat_inv, int & top, int & bottom, int & left, int & right, double & angle_degrees);
 static int findEditDistance(const string str1, const string str2, int cutoff, int order);
-int Min(int dis1, int dis2, int dis3);
+static int min(int dis1, int dis2, int dis3);
 
 int main(int argc, char** argv)
 {
@@ -184,20 +184,6 @@ int main(int argc, char** argv)
 }
 
 
-// static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth) {
-//   if (rect1.area() == 0 || rect2.area() == 0) return false;
-
-//   float dy1 = abs(rect1.tl().y - rect2.tl().y); //i and j's dot
-//   float dy2 = abs(rect1.br().y - rect2.br().y); //"al"'s problem
-//   float dx1 = abs(rect1.tl().x - rect2.br().x); //if rect2 is in front of rect1
-//   float dx2 = abs(rect1.br().x - rect2.tl().x);
-//   //two dx is because when the bounding box becomes a rectangule, the original dx will not work anymore
-//   //two rectangles intersect
-//   if ((rect1 & rect2).area() != 0 ) return true;
-//   if ((dy1 < 0.25 * cHeight || dy2 < 0.35 * cHeight) && (dx1 < 0.45 * cWidth || dx2 < 0.45 *cWidth)) return true;
-//   else return false;
-// }
-
 
 static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth) {
   if (rect1.area() == 0 || rect2.area() == 0) return false;
@@ -330,12 +316,12 @@ static int findEditDistance(const string str1, const string str2, int cutoff, in
        int dis1 = findEditDistance(str1, str2.substr(1), cutoff, order + 1) + 1;
        int dis2 = findEditDistance(str2, str1.substr(1), cutoff, order + 1) + 1;
        int dis3 = findEditDistance(str1.substr(1), str2.substr(1), cutoff, order + 1) + 1;
-       return Min(dis1, dis2, dis3);
+       return min(dis1, dis2, dis3);
     }
     return -1; //error flag
 }
 
-int Min(int dis1, int dis2, int dis3) {
+static int min(int dis1, int dis2, int dis3) {
     int dis[3] = {dis1, dis2, dis3};
     int minTmp = dis1;
     for (int i = 1; i < 3; i++) {
