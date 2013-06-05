@@ -1,7 +1,7 @@
 package com.ee368project.wordhunter;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,6 +19,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.PreviewCallback;
@@ -61,15 +63,15 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	
 	// name for storing image captured by camera view
 	private final static String INPUT_IMG_FILENAME = "/temp.jpg";
-//	static int SCAN_INIT = 0;
-//	static int SCAN_AUTOFOCUS_BEGIN = 1;
-//	static int SCAN_AUTOFOCUS_IN_PROGRESS = 2;
-//	static int SCAN_PROCESS_BEGIN = 3;
-//	static int SCAN_PROCESS_IN_PROGRESS = 4;
+	static int SCAN_AUTOFOCUS_BEGIN = 0;
+	static int SCAN_AUTOFOCUS_IN_PROGRESS = 1;
+	static int SCAN_PROCESS_BEGIN = 2;
+	static int SCAN_PROCESS_IN_PROGRESS = 3;
 	
 	//state machine
-	private final static int SCAN_IN_PREVIEW = 0;
-	private final static int SCAN_IN_PROCESS = 1;
+//	private final static int SCAN_IN_PREVIEW_AUTOFOCUS_BEGIN = 0;
+//	private final static int SCAN_IN_PREVIEW_AUTOFOCUS_PROCESS = 1;
+//	private final static int SCAN_IN_PROCESS = 2;
 	
 	
 	//Jason's camera
@@ -91,7 +93,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		
 		super(context);
 //		scanState = SCAN_AUTOFOCUS_BEGIN;
-		scanState = SCAN_IN_PREVIEW;
+		scanState = SCAN_AUTOFOCUS_BEGIN;
 		mContext = context;
 		mLabelOnTop = labelOnTop;
 		mFocusFlag = false;
@@ -124,8 +126,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				Log.d(TAG, "Picture callback");
   				//compress image
 				if (mOperationMode == ScanWordActivity.SCAN_MODE) {
-//					scanState = SCAN_PROCESS_IN_PROGRESS;
-					scanState = SCAN_IN_PROCESS;
+					scanState = SCAN_PROCESS_IN_PROGRESS;
 				}
   				compressByteImage(mContext, data, 75);  				
   				
@@ -145,9 +146,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				if (mOperationMode == SnapWordActivity.SNAP_MODE) {
 					Log.d(TAG, "Snap mode, onAutoFocus doesn't need take a picture");
 				} else if (mOperationMode == ScanWordActivity.SCAN_MODE) {
-					camera.takePicture(mShutterCallback, mRawCallback,
-							mJpegCallback);
-  					//scanState = SCAN_PROCESS_BEGIN;
+					scanState = SCAN_PROCESS_BEGIN;
 				}
 				//after auto-focus, set the mFocusFlag to true
 				if (success == true && mFocusFlag == false)
@@ -168,23 +167,16 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				  // Called for each frame previewed		
 		        public void onPreviewFrame(byte[] data, Camera camera) {  // <11>
 		        	Log.d(TAG, "Entered onPreviewFrame");
-//		        	if (scanState == SCAN_AUTOFOCUS_BEGIN) {
-//						Log.d(TAG, "in onPreviewFrame, state = SCAN_AUTOFOCUS_BEGIN");
-//					}else if (scanState == SCAN_AUTOFOCUS_IN_PROGRESS) {
-//						Log.d(TAG, "in onPreviewFrame, state = SCAN_AUTOFOCUS_IN_PROGRESS");
-//					}else if (scanState == SCAN_PROCESS_BEGIN) {
-//						Log.d(TAG, "in onPreviewFrame, state = SCAN_PROCESS_BEGIN");
-//					} else if (scanState == SCAN_PROCESS_IN_PROGRESS) {
-//						Log.d(TAG, "in onPreviewFrame, state = SCAN_PROCESS_IN_PROGRESS");
-//					}
-		        	
+	        	
 					if (mOperationMode == ScanWordActivity.SCAN_MODE) {
-						if (scanState == SCAN_IN_PREVIEW) {
+						if (scanState == SCAN_AUTOFOCUS_BEGIN) {
 							mCamera.autoFocus(mAutoFocusCallback);
-							scanState = SCAN_IN_PROCESS;
-						//} else if (scanState == SCAN_PROCESS_BEGIN) {
-							//doesn't need to do anything   	
-							  
+							scanState = SCAN_AUTOFOCUS_IN_PROGRESS;
+						} else if (scanState == SCAN_PROCESS_BEGIN) {
+							scanState = SCAN_PROCESS_IN_PROGRESS;
+							compressByteImage(mContext, data, 75);  	
+			  				ServerTask task = new ServerTask();
+			  				task.execute( Environment.getExternalStorageDirectory().toString() +INPUT_IMG_FILENAME);
 						}
 					}
 					//invalid the preview so that we can draw layer on top of it
@@ -242,32 +234,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		mCamera.startPreview();
 	}
 	
-    /*static public void decodeYUV420SP(int[] rgb, byte[] yuv420sp, int width, int height) {
-    	final int frameSize = width * height;
-    	
-    	for (int j = 0, yp = 0; j < height; j++) {
-    		int uvp = frameSize + (j >> 1) * width, u = 0, v = 0;
-    		for (int i = 0; i < width; i++, yp++) {
-    			int y = (0xff & ((int) yuv420sp[yp])) - 16;
-    			if (y < 0) y = 0;
-    			if ((i & 1) == 0) {
-    				v = (0xff & yuv420sp[uvp++]) - 128;
-    				u = (0xff & yuv420sp[uvp++]) - 128;
-    			}
-    			
-    			int y1192 = 1192 * y;
-    			int r = (y1192 + 1634 * v);
-    			int g = (y1192 - 833 * v - 400 * u);
-    			int b = (y1192 + 2066 * u);
-    			
-    			if (r < 0) r = 0; else if (r > 262143) r = 262143;
-    			if (g < 0) g = 0; else if (g > 262143) g = 262143;
-    			if (b < 0) b = 0; else if (b > 262143) b = 262143;
-    			
-    			rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
-    		}
-    	}
-    }*/
+   
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		// Surface will be destroyed when we return, so stop the preview.
 		// Because the CameraDevice object is not a shared resource, it's very
@@ -293,17 +260,22 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inSampleSize = 1; // no downsampling
 			Bitmap myImage = null;
-			/*int[] rgbArray = null;
-			if (mModeFlag == SnapWordActivity.SNAP_MODE) {
-				myImage = BitmapFactory.decodeByteArray(imageData, 0,
-						imageData.length, options);
-			} else if (mModeFlag == ScanWordActivity.SCAN_MODE) {
-				decodeYUV420SP(rgbArray, imageData, mWidthPreview,  mHeightPreview);
-				myImage = BitmapFactory.decodeByteArray(rgbArray, 0,
-						imageData.length, options);
-			}*/
-			 myImage = BitmapFactory.decodeByteArray(imageData, 0,
-					imageData.length, options);
+		
+			if (mOperationMode == ScanWordActivity.SCAN_MODE) {
+				Camera.Size previewSize = mCamera.getParameters().getPreviewSize(); 
+				YuvImage yuvimage=new YuvImage(imageData, ImageFormat.NV21, previewSize.width, previewSize.height, null);
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				yuvimage.compressToJpeg(new Rect(0, 0, previewSize.width, previewSize.height), 80, baos);
+				byte[] jdata = baos.toByteArray();
+
+				// Convert to Bitmap
+				myImage = BitmapFactory.decodeByteArray(jdata, 0, jdata.length);
+				} else if (mOperationMode == SnapWordActivity.SNAP_MODE) {
+					myImage = BitmapFactory.decodeByteArray(imageData, 0,
+							imageData.length, options);
+				}
+			
+			
 			fileOutputStream = new FileOutputStream(sdCard.toString()
 					+ INPUT_IMG_FILENAME);
 			Log.d(TAG, "Image length is " + Integer.toString(imageData.length));
@@ -427,7 +399,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				is = conn.getInputStream();
 				// push state change a little earlier
 				// from within getResultImage(conn) to before it
-				scanState = SCAN_IN_PREVIEW;
+				scanState = SCAN_AUTOFOCUS_BEGIN;
 				// get result image from server
 				mLabelOnTop.mBitmap = BitmapFactory.decodeStream(is);
 				mLabelOnTop.setCanvasState(mOperationMode);
