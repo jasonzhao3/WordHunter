@@ -61,11 +61,17 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	
 	// name for storing image captured by camera view
 	private final static String INPUT_IMG_FILENAME = "/temp.jpg";
-	static int SCAN_INIT = 0;
-	static int SCAN_AUTOFOCUS_BEGIN = 1;
-	static int SCAN_AUTOFOCUS_IN_PROGRESS = 2;
-	static int SCAN_PROCESS_BEGIN = 3;
-	static int SCAN_PROCESS_IN_PROGRESS = 4;
+//	static int SCAN_INIT = 0;
+//	static int SCAN_AUTOFOCUS_BEGIN = 1;
+//	static int SCAN_AUTOFOCUS_IN_PROGRESS = 2;
+//	static int SCAN_PROCESS_BEGIN = 3;
+//	static int SCAN_PROCESS_IN_PROGRESS = 4;
+	
+	//state machine
+	private final static int SCAN_IN_PREVIEW = 0;
+	private final static int SCAN_IN_PROCESS = 1;
+	
+	
 	//Jason's camera
 	static int mWidthPreview = 960;
 	static int mHeightPreview = 640;
@@ -84,7 +90,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	Preview(Context context, LabelOnTop labelOnTop, int modeFlag, String message) {
 		
 		super(context);
-		scanState = SCAN_AUTOFOCUS_BEGIN;
+//		scanState = SCAN_AUTOFOCUS_BEGIN;
+		scanState = SCAN_IN_PREVIEW;
 		mContext = context;
 		mLabelOnTop = labelOnTop;
 		mFocusFlag = false;
@@ -117,7 +124,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				Log.d(TAG, "Picture callback");
   				//compress image
 				if (mOperationMode == ScanWordActivity.SCAN_MODE) {
-					scanState = SCAN_PROCESS_IN_PROGRESS;
+//					scanState = SCAN_PROCESS_IN_PROGRESS;
+					scanState = SCAN_IN_PROCESS;
 				}
   				compressByteImage(mContext, data, 75);  				
   				
@@ -130,7 +138,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		};
 
-		// register a auto-focus call back
+		// register an auto-focus call back
 		mAutoFocusCallback = new Camera.AutoFocusCallback() {
 			public void onAutoFocus(boolean success, Camera camera) {
 				Log.d(TAG, "I'm already in the onAutoFocus callback");
@@ -139,7 +147,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				} else if (mOperationMode == ScanWordActivity.SCAN_MODE) {
 					camera.takePicture(mShutterCallback, mRawCallback,
 							mJpegCallback);
-  					scanState = SCAN_PROCESS_BEGIN;
+  					//scanState = SCAN_PROCESS_BEGIN;
 				}
 				//after auto-focus, set the mFocusFlag to true
 				if (success == true && mFocusFlag == false)
@@ -160,35 +168,27 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				  // Called for each frame previewed		
 		        public void onPreviewFrame(byte[] data, Camera camera) {  // <11>
 		        	Log.d(TAG, "Entered onPreviewFrame");
-		        	if (scanState == SCAN_AUTOFOCUS_BEGIN) {
-						Log.d(TAG, "in onPreviewFrame, state = SCAN_AUTOFOCUS_BEGIN");
-					}else if (scanState == SCAN_AUTOFOCUS_IN_PROGRESS) {
-						Log.d(TAG, "in onPreviewFrame, state = SCAN_AUTOFOCUS_IN_PROGRESS");
-					}else if (scanState == SCAN_PROCESS_BEGIN) {
-						Log.d(TAG, "in onPreviewFrame, state = SCAN_PROCESS_BEGIN");
-					} else if (scanState == SCAN_PROCESS_IN_PROGRESS) {
-						Log.d(TAG, "in onPreviewFrame, state = SCAN_PROCESS_IN_PROGRESS");
-					}
-					/*if (mFocusFlag == true && mOperationMode == ScanWordActivity.SCAN_MODE) {
-						compressByteImage(mContext, data, 75);  				
-						//** Send image and offload image processing task  to server by starting async task ** 
-						ServerTask task = new ServerTask();
-						task.execute( Environment.getExternalStorageDirectory().toString() +INPUT_IMG_FILENAME);
-						//start the camera view again .
-						camera.startPreview();  
-					}*/
+//		        	if (scanState == SCAN_AUTOFOCUS_BEGIN) {
+//						Log.d(TAG, "in onPreviewFrame, state = SCAN_AUTOFOCUS_BEGIN");
+//					}else if (scanState == SCAN_AUTOFOCUS_IN_PROGRESS) {
+//						Log.d(TAG, "in onPreviewFrame, state = SCAN_AUTOFOCUS_IN_PROGRESS");
+//					}else if (scanState == SCAN_PROCESS_BEGIN) {
+//						Log.d(TAG, "in onPreviewFrame, state = SCAN_PROCESS_BEGIN");
+//					} else if (scanState == SCAN_PROCESS_IN_PROGRESS) {
+//						Log.d(TAG, "in onPreviewFrame, state = SCAN_PROCESS_IN_PROGRESS");
+//					}
 		        	
 					if (mOperationMode == ScanWordActivity.SCAN_MODE) {
-						if (scanState == SCAN_AUTOFOCUS_BEGIN) {
+						if (scanState == SCAN_IN_PREVIEW) {
 							mCamera.autoFocus(mAutoFocusCallback);
-							scanState = SCAN_AUTOFOCUS_IN_PROGRESS;
-						} else if (scanState == SCAN_PROCESS_BEGIN) {
-							//compressByteImage(mContext, data, 75);  	
-							//camera.startPreview();  
+							scanState = SCAN_IN_PROCESS;
+						//} else if (scanState == SCAN_PROCESS_BEGIN) {
+							//doesn't need to do anything   	
+							  
 						}
 					}
+					//invalid the preview so that we can draw layer on top of it
 					Preview.this.invalidate();
-		        	
 		        }
 		      });
 		   
@@ -425,13 +425,16 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			InputStream is;
 			try {
 				is = conn.getInputStream();
+				// push state change a little earlier
+				// from within getResultImage(conn) to before it
+				scanState = SCAN_IN_PREVIEW;
 				// get result image from server
 				mLabelOnTop.mBitmap = BitmapFactory.decodeStream(is);
+				mLabelOnTop.setCanvasState(mOperationMode);
 				is.close();
-				//mLabelOnTop.mState = 1; //STATE_SNAP_MODE
-				mLabelOnTop.mCanvasState = mOperationMode;
-				scanState = SCAN_AUTOFOCUS_BEGIN;
+				//scanState = SCAN_IN_PREVIEW;
 			} catch (IOException e) {
+				Log.d(TAG, "not get the result yet!!!!!!!!!!!");
 				Log.e(TAG, e.toString());
 				e.printStackTrace();
 			}
@@ -451,7 +454,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			
 			File inputFile = new File(inputImageFilePath);
 			try {
-
+				
 				// create file stream for captured image file
 				FileInputStream fileInputStream = new FileInputStream(inputFile);
 
@@ -460,6 +463,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 
 				// get processed photo from server
 				if (conn != null) {
+					
 					getResultImage(conn);
 				}
 				fileInputStream.close();

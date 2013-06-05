@@ -6,7 +6,7 @@ while (True):
 	# % Wait until image is ready
     imageReadyFile = './upload/image_ready';
     if not os.path.exists(imageReadyFile): 
-        time.sleep(0.3);
+        time.sleep(0.01);
         print('Waiting for image-is-ready signal');
         continue;
     
