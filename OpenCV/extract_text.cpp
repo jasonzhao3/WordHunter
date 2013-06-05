@@ -99,10 +99,10 @@ int main(int argc, char** argv)
           cvtColor(deskewedImage, contourImage, CV_GRAY2RGB, 0);  
           //findContours(deskewedImage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
           findContours(deskewedImage, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
-           for (int i = 0; i < contours.size(); i++) {
-             drawContours(contourImage, contours, i, Scalar(255, 0, 0), 1, 8, hierarchy, 0, Point());
-           }
-           imwrite("contours.jpg", contourImage);
+//           for (int i = 0; i < contours.size(); i++) {
+//             drawContours(contourImage, contours, i, Scalar(255, 0, 0), 1, 8, hierarchy, 0, Point());
+//           }
+//           imwrite("contours.jpg", contourImage);
 
           Mat letterWithBox = wordWithBox.clone();
 
@@ -129,10 +129,10 @@ int main(int argc, char** argv)
           // output result
           //imwrite("result_image.jpg", resultImage);
           imwrite("./output/bb_mask.jpg", bb_mask_inv_cropped);
-          imwrite("color_deskew_inv.jpg", color_deskew_inv);
           imwrite("./output/result_image.jpg", color_deskew_inv_cropped);
-          imwrite("letter_with_bounding_box.jpg", letterWithBox);
-          imwrite("word_with_bounding_box.jpg", wordWithBox);
+          //imwrite("color_deskew_inv.jpg", color_deskew_inv);
+//          imwrite("letter_with_bounding_box.jpg", letterWithBox);
+//          imwrite("word_with_bounding_box.jpg", wordWithBox);
   } else {
           Mat bb_mask_inv;
           Mat bb_mask_inv_cropped; 
@@ -175,8 +175,8 @@ int main(int argc, char** argv)
           //imwrite("result_image.jpg", resultImage);
           imwrite("./output/bb_mask.jpg", bb_mask);
           imwrite("./output/result_image.jpg", resultImage);
-          imwrite("letter_with_bounding_box.jpg", letterWithBox);
-          imwrite("word_with_bounding_box.jpg", wordWithBox);
+//          imwrite("letter_with_bounding_box.jpg", letterWithBox);
+//          imwrite("word_with_bounding_box.jpg", wordWithBox);
   }
   printf("image saved successfully.\n");
   waitKey(0);
@@ -502,10 +502,10 @@ static void deskewText(Mat & src, Mat & deskewedImg, Mat & color_src, Mat & colo
           //imshow("after deskew", deskewedImg);
           threshold(deskewedImg_blurred, deskewedImg, 128, 255, THRESH_BINARY);
           // waitKey(0);
-          imwrite("color_src_padded.jpg", color_src_padded);
-          imwrite("src_image.jpg", src);
-          imwrite("deskewed_image.jpg", deskewedImg);
-          imwrite("color_image_deskew.jpg", color_deskew);
+//          imwrite("color_src_padded.jpg", color_src_padded);
+//          imwrite("src_image.jpg", src);
+//          imwrite("deskewed_image.jpg", deskewedImg);
+//          imwrite("color_image_deskew.jpg", color_deskew);
   } else {
           cout << "angle is " << angle_degrees << " No need for deskew"<< endl;
   }
