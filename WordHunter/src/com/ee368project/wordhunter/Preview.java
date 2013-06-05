@@ -58,8 +58,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	Camera.AutoFocusCallback mAutoFocusCallback;
 	int scanModeProcessing;
 
-//	private final String SERVERURL = "http://www.stanford.edu/~yzhao3/cgi-bin/ee368/searchWordOnCorn.php";
-	private final String SERVERURL = "http://www.stanford.edu/~shuol/cgi-bin/searchWordOnCorn.php";
+	private final String SERVERURL = "http://www.stanford.edu/~yzhao3/cgi-bin/ee368/searchWordOnCorn.php";
+//	private final String SERVERURL = "http://www.stanford.edu/~shuol/cgi-bin/searchWordOnCorn.php";
 	// name for storing image captured by camera view
 	private final static String INPUT_IMG_FILENAME = "/temp.jpg";
 	static int SCAN_INIT = 0;
@@ -252,11 +252,13 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		// the preview.
 		Camera.Parameters parameters = mCamera.getParameters();
 
-		
-		//parameters.setPictureSize(mWidthPicture, mHeightPicture);
-		//parameters.setPreviewSize(mWidthPreview, mHeightPreview);
-		parameters.setPictureSize(1024, 768);
-		//parameters.setPreviewSize(1024, 768);
+		//Jason's camera
+		//    parameters.setPreviewSize(960, 640);
+		    parameters.setPictureSize(1280, 960);
+		 
+		//Shuo's camera
+		//    parameters.setPictureSize(1024, 768);
+	
 		List<Camera.Size> picSizes = parameters.getSupportedPictureSizes();
 		List<Camera.Size> previewSize = parameters.getSupportedPreviewSizes();
 		Log.d(LOG_TAG, "hello everybody\n");

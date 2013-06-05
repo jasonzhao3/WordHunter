@@ -60,6 +60,7 @@ if(copy($_FILES['uploadedfile']['tmp_name'], $photo_upload_path)) {
 	#<5>signal that the image is ready
 	$handle = fopen($photo_upload_indicator_path, 'w');
   $photo_name_with_word = $photo_upload_path . $_GET['word'];
+  $mode = $_GET['mode'];
 	fprintf($handle, '%s', $photo_name_with_word);
   // fprintf($handle, '%s', $photo_upload_path);
 	fclose($handle);
