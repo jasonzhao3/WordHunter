@@ -42,32 +42,25 @@ We applied OpenCV function adaptiveThreshold for binarization.  We also observed
 
 \begin{figure}
 \center
-\includegraphics[scale=0.25]{no_skew.jpg}
+\includegraphics[scale=0.15]{test261.jpg}
 \caption{Before Binarization}
 \label{noskew}
 \end{figure}
 
 \begin{figure}
 \center
-\includegraphics[scale=0.25]{no_skew_binarized.jpg}
+\includegraphics[scale=0.15]{src_image.jpg}
 \caption{After Binarization}
 \label{noskewbinarized}
 \end{figure}
 
 \subsection{De-skew}
 
-Hough transform (OpenCV function HoughLinesP) is used to detect (text) lines in the image.  Then we rotate binarized image by the mean of the rotation angles calculated from each text line, we call OpenCV function getRotationMatrix2D to do it.  We also need to make sure not to cut off corners in the rotation process, therefore we need to pad the binarized image before rotating.  See Figure~\ref{binarized} and Figure~\ref{deskewed} for an example of image before and after de-skew.  Notice that Figure~\ref{deskewed} is slightly larger because of padding.
+Hough transform (OpenCV function HoughLinesP) is used to detect (text) lines in the image.  Then we rotate binarized image by the mean of the rotation angles calculated from each text line, we call OpenCV function getRotationMatrix2D to do it.  We also need to make sure not to cut off corners in the rotation process, therefore we need to pad the binarized image before rotating.  See Figure~\ref{deskewed} for an example of image before and after de-skew.  Notice that Figure~\ref{deskewed} is slightly larger than images above because of padding.
 
 \begin{figure}
 \center
-\includegraphics[scale=0.15]{binarized.jpg}
-\caption{Binarized Image Before Deskew}
-\label{binarized}
-\end{figure}
-
-\begin{figure}
-\center
-\includegraphics[scale=0.15]{deskewedImage.jpg}
+\includegraphics[scale=0.10]{deskewedImage.jpg}
 \caption{Binarized And Deskewed}
 \label{deskewed}
 \end{figure}
@@ -81,7 +74,7 @@ Some letters (for instance, lower case ``i'', ``j'') consists of two connected c
 
 \begin{figure}
 \center
-\includegraphics[scale=0.15]{letter_with_bounding_box.jpg}
+\includegraphics[scale=0.10]{letter_with_bounding_box.jpg}
 \caption{Segmentation By Letter}
 \label{letterbbox}
 \end{figure}
@@ -117,7 +110,7 @@ See Figure~\ref{wordbbox} for an example of segmentation by word.
 
 \begin{figure}
 \center
-\includegraphics[scale=0.15]{word_with_bounding_box.jpg}
+\includegraphics[scale=0.10]{word_with_bounding_box.jpg}
 \caption{Segmentation By word}
 \label{wordbbox}
 \end{figure}
@@ -129,9 +122,38 @@ Exact or non-exact matches is determined by the ratio between edit distance (or 
 
 Levenshtein distance is defined to be the minimum number of single-letter operations (insertion, deletion or substitution) needed to transform one string into another.  For example, to change ``abcd'' into ``bcda'', one can either change each letter (change the first letter ``a'' to ``b'', the second letter ``b'' to ``c'', the third letter ``c'' to ``d'', the fourth letter ``d'' to ``a'' ), which has a total of four operations, or delete the ``a'' from the beginning of the string and add an ``a'' to the end of it, which has a total of two operations.  Therefore the Levenshtein distance between the two strings is two.  The distance can be calculated between any two strings using recursion.
 
+Finally we draw rectangular boxes of different colors (in order to differentiate between exact matches and close matches) at the coordinates where we find matches, and then overlay the image onto the orginal image.  See Figure~\ref{boxes_overlay} and Figure~\ref{result_image} for illustration of searching and labeling keyword matches.
+
+\begin{figure}
+\center
+\includegraphics[scale=0.15]{bb_mask_inv_cropped.jpg}
+\caption{Highlight Boxes}
+\label{boxes_overlay}
+\end{figure}
+
+\begin{figure}
+\center
+\includegraphics[scale=0.15]{result_image.jpg}
+\caption{Result Displayed}
+\label{result_image}
+\end{figure}
+
+
 \section{Server Client Connection}
 
-\section{Conclusion}
+OCR is an extremely computationally intensive operation. To perform this operation using the processors on an outdated smartphone would be impractical. Therefore, we decided to offload OCR and all other image processing operations onto the Stanford servers. The server side consists of two layers. The outer layer is a php script that waits for an http connection. Once the connection is established, the php script receives the image uploaded by the phone along with other parameters and stores them on the afs disk. However the server on which the php script lives does not have the necessary libraries to run OCR and opencv. Therefore, we implemented a backend python script that’s responsible for linking up with the php script and executing the opencv/OCR executable on the Stanford corn server. Once the processing is complete, the php script picks up the output image and streams it back to the phone. 
+
+On the client side, WordHunter has two modes. The first mode, snap mode, takes a picture if the text when the user taps the screen. It then sends the image to the server for processing. After the image is received from the server, the phone will display it on the screen until the user hits the back button to enter a new word.  The second mode, scan mode, continuously cycles through the above mentioned process seamlessly without any user intervention. Instead of displaying the image in the screen however, it will overlay a bounding box on top of the viewfinder to mark the desired word in real time.  Figure~\ref{server_client} illustrates the connection from client side/mobile device to Stanford servers to corn servers.
+
+\begin{figure}
+\center
+\includegraphics[scale=0.15]{server_client_connection.jpg}
+\caption{Server-Client Connection}
+\label{server_client}
+\end{figure}
+
+
+\section{Emperical Results}
 
 \section*{Acknowledgment}
 We would like to thank David Chen and Sam Tsai for their generous and responsive help on the project.  We would also like to thank Professor Girod for his inspiring lectures.
