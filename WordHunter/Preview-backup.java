@@ -63,13 +63,16 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	
 	// name for storing image captured by camera view
 	private final static String INPUT_IMG_FILENAME = "/temp.jpg";
+	static int SCAN_AUTOFOCUS_BEGIN = 0;
+	static int SCAN_AUTOFOCUS_IN_PROGRESS = 1;
+	static int SCAN_PROCESS_BEGIN = 2;
+	static int SCAN_PROCESS_IN_PROGRESS = 3;
 	
-	// state machine
-	static int SCAN_AUTOFOCUS_INIT = 0;
-	static int SCAN_AUTOFOCUS_BEGIN = 1;
-	static int SCAN_AUTOFOCUS_IN_PROGRESS = 2;
-	static int SCAN_PROCESS_BEGIN = 3;
-	static int SCAN_PROCESS_IN_PROGRESS = 4;
+	//state machine
+//	private final static int SCAN_IN_PREVIEW_AUTOFOCUS_BEGIN = 0;
+//	private final static int SCAN_IN_PREVIEW_AUTOFOCUS_PROCESS = 1;
+//	private final static int SCAN_IN_PROCESS = 2;
+	
 	
 	//Jason's camera
 	static int mWidthPreview = 960;
@@ -89,7 +92,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	Preview(Context context, LabelOnTop labelOnTop, int modeFlag, String message) {
 		
 		super(context);
-		scanState = SCAN_AUTOFOCUS_INIT;
+//		scanState = SCAN_AUTOFOCUS_BEGIN;
+		scanState = SCAN_AUTOFOCUS_BEGIN;
 		mContext = context;
 		mLabelOnTop = labelOnTop;
 		mFocusFlag = false;
@@ -164,13 +168,10 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		        public void onPreviewFrame(byte[] data, Camera camera) {  // <11>
 		        	Log.d(TAG, "Entered onPreviewFrame");
 	        	
-		        	//Scan mode needs multiple states -- state machine
 					if (mOperationMode == ScanWordActivity.SCAN_MODE) {
-						if (scanState == SCAN_AUTOFOCUS_INIT) {
+						if (scanState == SCAN_AUTOFOCUS_BEGIN) {
 							mCamera.autoFocus(mAutoFocusCallback);
 							scanState = SCAN_AUTOFOCUS_IN_PROGRESS;
-						} else if (scanState == SCAN_AUTOFOCUS_BEGIN) {
-							scanState = SCAN_PROCESS_BEGIN;
 						} else if (scanState == SCAN_PROCESS_BEGIN) {
 							scanState = SCAN_PROCESS_IN_PROGRESS;
 							compressByteImage(mContext, data, 75);  	
@@ -178,8 +179,6 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			  				task.execute( Environment.getExternalStorageDirectory().toString() +INPUT_IMG_FILENAME);
 						}
 					}
-					// Snap mode and Game mode doesn't need to do anything special
-					
 					//invalid the preview so that we can draw layer on top of it
 					Preview.this.invalidate();
 		        }
@@ -204,10 +203,30 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		// Now that the size is known, set up the camera parameters and begin
 		// the preview.
-//		findPictureSize(parameters, LOG_TAG);
 		Camera.Parameters parameters = mCamera.getParameters();
-		parameters.setPictureSize(mWidthPicture, mHeightPicture);
+
+		//Jason's camera
+		//  parameters.setPreviewSize(960, 640);
+		    parameters.setPictureSize(1280, 960);
+		 
+		//Shuo's camera
+		//    parameters.setPictureSize(1024, 768);
+	
+		List<Camera.Size> picSizes = parameters.getSupportedPictureSizes();
+		List<Camera.Size> previewSize = parameters.getSupportedPreviewSizes();
+		Log.d(LOG_TAG, "hello everybody\n");
+		List<String> focusModes = parameters.getSupportedFocusModes();
 		
+		for (Camera.Size size : picSizes) {
+			Log.d(LOG_TAG, "supported picture size: height: " + size.height + " width:  " + size.width);
+		}
+		for (Camera.Size size : picSizes) {
+			Log.d(LOG_TAG, "supported preview size: height: " + size.height + " width:  " + size.width);
+		}
+		for (String mode : focusModes) {
+			Log.d(LOG_TAG, "supported focus modes: " + mode);
+		}
+		Log.d(LOG_TAG, "Picture format is " + parameters.getPictureFormat());
 		parameters.setPreviewFrameRate(15);
 //		parameters.setSceneMode(Camera.Parameters.SCENE_MODE_NIGHT);
 		parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
@@ -251,7 +270,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 
 				// Convert to Bitmap
 				myImage = BitmapFactory.decodeByteArray(jdata, 0, jdata.length);
-				} else {
+				} else if (mOperationMode == SnapWordActivity.SNAP_MODE) {
 					myImage = BitmapFactory.decodeByteArray(imageData, 0,
 							imageData.length, options);
 				}
@@ -279,11 +298,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		} 
 		return true;
 	}
-	
-	public void setOperationMode(int operationMode) {
-		this.mOperationMode = operationMode;
-	}
-	
+
 
 	/**
 	 * Inner class -- ServerTask, used to upload the image file to the server
@@ -372,6 +387,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				return null;
 			}
 		}
+
 				
 		
 		// get image result from server and display it in result view
@@ -419,6 +435,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 
 				// get processed photo from server
 				if (conn != null) {
+					
 					getResultImage(conn);
 				}
 				fileInputStream.close();
@@ -442,6 +459,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 															// operation
 			String uploadFilePath = params[0];
 			processImage(uploadFilePath);
+			// release camera when previous image is processed
+			//mFocusFlag = true;
 			return null;
 		}
 

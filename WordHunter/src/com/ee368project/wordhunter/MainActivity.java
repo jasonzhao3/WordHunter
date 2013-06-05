@@ -50,6 +50,15 @@ public class MainActivity extends Activity {
 
 	}
 	
+	public void hunterGame(View view) {
+		Intent intent = new Intent(this, HunterGameActivity.class);
+		EditText editText = (EditText) findViewById(R.id.edit_message);
+		String message = editText.getText().toString();
+		// putExtra: first parameter: key, second parameter: value
+		intent.putExtra(WORD_TO_SEARCH, message);
+		startActivity(intent);
+	}
+	
 	
 
 }

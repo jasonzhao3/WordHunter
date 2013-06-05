@@ -68,6 +68,19 @@ public class LabelOnTop extends View {
 			Rect dst=new Rect(0,0,canvas.getWidth(),canvas.getHeight());
 			mPaintRed.setAlpha(150);
 			canvas.drawBitmap(mBitmap, src, dst, mPaintRed);
+		} else if (mCanvasState == HunterGameActivity.GAME_MODE && mBitmap != null) {
+			Rect src = new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+			//get current screen size
+			Rect dst=new Rect(0,0,canvas.getWidth(),canvas.getHeight());
+			mPaintRed.setAlpha(150);
+			canvas.drawBitmap(mBitmap, src, dst, mPaintRed);
+			
+		} else if (mCanvasState == HunterGameActivity.GAME_RESULT_MODE && mBitmap != null) {
+			Rect src = new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+			//get current screen size
+			Rect dst=new Rect(0,0,canvas.getWidth(),canvas.getHeight());
+			mPaintRed.setAlpha(255);
+			canvas.drawBitmap(mBitmap, src, dst, mPaintRed);
 		} else if (mCanvasState == CLEAR) {
 			canvas.drawPaint(mPaintTransparent);
 		}

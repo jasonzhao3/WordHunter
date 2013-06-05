@@ -17,8 +17,8 @@
     </uses-permission>
     <uses-permission android:name="android.permission.INTERNET" >
     </uses-permission>
-	<uses-permission
-        android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -43,6 +43,13 @@
         <activity
             android:name="com.ee368project.wordhunter.ScanWordActivity"
             android:label="@string/title_activity_scan_word" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.ee368project.wordhunter.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.ee368project.wordhunter.HunterGameActivity"
+            android:label="@string/title_activity_word_game" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.ee368project.wordhunter.MainActivity" />

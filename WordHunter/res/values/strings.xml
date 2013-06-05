@@ -4,12 +4,14 @@
     <string name="app_name">Word Hunter</string>
     <string name="edit_message">Enter a word to search</string>
     <string name="button_snapWord">Snap Mode</string>
-    <string name="button_scanword">Scan Mode</string>
+    <string name="button_scanWord">Scan Mode</string>
+    <string name="button_hunterGame">Hunter Game</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_word_hunter">WordHunterActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_snap_word">SnapWordActivity</string>
     <string name="title_activity_scan_word">ScanWordActivity</string>
+    <string name="title_activity_word_game">WordGameActivity</string>
 
 </resources>

@@ -24,7 +24,16 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/edit_message"
         android:layout_centerHorizontal="true"
-        android:text="@string/button_scanword"
+        android:text="@string/button_scanWord"
         android:onClick="scanWord" />
+     
+     
+     <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edit_message"
+        android:layout_alignParentRight="true"
+        android:text="@string/button_hunterGame"
+        android:onClick="hunterGame" />
      
 </RelativeLayout>

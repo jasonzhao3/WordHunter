@@ -1,30 +1,30 @@
 package com.ee368project.wordhunter;
-import com.ee368project.wordhunter.Preview;
-import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.hardware.Camera.PictureCallback;
+
 import android.os.Bundle;
-import android.os.Environment;
+import android.app.Activity;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.ViewGroup.LayoutParams;
+import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.ViewGroup.LayoutParams;
+import android.support.v4.app.NavUtils;
+import android.annotation.TargetApi;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.os.Build;
 
-public class SnapWordActivity extends Activity {
+public class HunterGameActivity extends Activity {
 
-	static int SNAP_MODE = 1;
-	
 	private Preview mPreview;
 	private LabelOnTop mLabelOnTop;
+	final static int GAME_MODE = 3;
+	final static int GAME_RESULT_MODE = 4;
 	
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		// set window configuration
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -35,9 +35,10 @@ public class SnapWordActivity extends Activity {
 		String message = intent.getStringExtra(MainActivity.WORD_TO_SEARCH);
 		// Create our Preview view and set it as the content of our activity.
 		// Create our DrawOnTop view.
-		mLabelOnTop = new LabelOnTop(this, SNAP_MODE);
+		
+		mLabelOnTop = new LabelOnTop(this, GAME_MODE);
 		// SnapMode: modeFlag = true
-		mPreview = new Preview(this, mLabelOnTop, SNAP_MODE, message);
+		mPreview = new Preview(this, mLabelOnTop, GAME_MODE, message);
 	
 		setContentView(mPreview);
 		addContentView(mLabelOnTop, new LayoutParams(LayoutParams.WRAP_CONTENT,
@@ -45,13 +46,13 @@ public class SnapWordActivity extends Activity {
 		
 		// set the orientation as landscape
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
 	}
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.snap_word, menu);
+		getMenuInflater().inflate(R.menu.hunter_game, menu);
 		return true;
 	}
 	
@@ -64,11 +65,13 @@ public class SnapWordActivity extends Activity {
 			mPreview.mCamera.takePicture(mPreview.mShutterCallback, mPreview.mRawCallback,
 					mPreview.mJpegCallback);
 			return false;
-		//clear the drawingOnTop, restart the view
-		} else if (keycode == KeyEvent.KEYCODE_CAMERA) {
-			mLabelOnTop.setCanvasState(LabelOnTop.CLEAR);
+		}  else if (keycode == KeyEvent.KEYCODE_CAMERA) {
+			mPreview.setOperationMode(GAME_RESULT_MODE);
+			mPreview.mCamera.takePicture(mPreview.mShutterCallback, mPreview.mRawCallback,
+					mPreview.mJpegCallback);
 			return false;
 		}
+		
 		return super.onKeyDown(keycode, event);
 	}
 
