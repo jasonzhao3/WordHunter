@@ -63,10 +63,11 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	
 	// name for storing image captured by camera view
 	private final static String INPUT_IMG_FILENAME = "/temp.jpg";
-	static int SCAN_AUTOFOCUS_BEGIN = 0;
-	static int SCAN_AUTOFOCUS_IN_PROGRESS = 1;
-	static int SCAN_PROCESS_BEGIN = 2;
-	static int SCAN_PROCESS_IN_PROGRESS = 3;
+	static int SCAN_AUTOFOCUS_INIT = 0;
+	static int SCAN_AUTOFOCUS_BEGIN = 1;
+	static int SCAN_AUTOFOCUS_IN_PROGRESS = 2;
+	static int SCAN_PROCESS_BEGIN = 3;
+	static int SCAN_PROCESS_IN_PROGRESS = 4;
 	
 	//state machine
 //	private final static int SCAN_IN_PREVIEW_AUTOFOCUS_BEGIN = 0;
@@ -93,7 +94,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		
 		super(context);
 //		scanState = SCAN_AUTOFOCUS_BEGIN;
-		scanState = SCAN_AUTOFOCUS_BEGIN;
+		scanState = SCAN_AUTOFOCUS_INIT;
 		mContext = context;
 		mLabelOnTop = labelOnTop;
 		mFocusFlag = false;
@@ -169,9 +170,11 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		        	Log.d(TAG, "Entered onPreviewFrame");
 	        	
 					if (mOperationMode == ScanWordActivity.SCAN_MODE) {
-						if (scanState == SCAN_AUTOFOCUS_BEGIN) {
+						if (scanState == SCAN_AUTOFOCUS_INIT) {
 							mCamera.autoFocus(mAutoFocusCallback);
 							scanState = SCAN_AUTOFOCUS_IN_PROGRESS;
+						} else if (scanState == SCAN_AUTOFOCUS_BEGIN) {
+							scanState = SCAN_PROCESS_BEGIN;
 						} else if (scanState == SCAN_PROCESS_BEGIN) {
 							scanState = SCAN_PROCESS_IN_PROGRESS;
 							compressByteImage(mContext, data, 75);  	
@@ -203,30 +206,10 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		// Now that the size is known, set up the camera parameters and begin
 		// the preview.
+//		findPictureSize(parameters, LOG_TAG);
 		Camera.Parameters parameters = mCamera.getParameters();
-
-		//Jason's camera
-		//  parameters.setPreviewSize(960, 640);
-		    parameters.setPictureSize(1280, 960);
-		 
-		//Shuo's camera
-		//    parameters.setPictureSize(1024, 768);
-	
-		List<Camera.Size> picSizes = parameters.getSupportedPictureSizes();
-		List<Camera.Size> previewSize = parameters.getSupportedPreviewSizes();
-		Log.d(LOG_TAG, "hello everybody\n");
-		List<String> focusModes = parameters.getSupportedFocusModes();
+		parameters.setPictureSize(mWidthPicture, mHeightPicture);
 		
-		for (Camera.Size size : picSizes) {
-			Log.d(LOG_TAG, "supported picture size: height: " + size.height + " width:  " + size.width);
-		}
-		for (Camera.Size size : picSizes) {
-			Log.d(LOG_TAG, "supported preview size: height: " + size.height + " width:  " + size.width);
-		}
-		for (String mode : focusModes) {
-			Log.d(LOG_TAG, "supported focus modes: " + mode);
-		}
-		Log.d(LOG_TAG, "Picture format is " + parameters.getPictureFormat());
 		parameters.setPreviewFrameRate(15);
 //		parameters.setSceneMode(Camera.Parameters.SCENE_MODE_NIGHT);
 		parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
@@ -298,7 +281,6 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		} 
 		return true;
 	}
-
 
 	/**
 	 * Inner class -- ServerTask, used to upload the image file to the server
@@ -387,7 +369,6 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				return null;
 			}
 		}
-
 				
 		
 		// get image result from server and display it in result view
