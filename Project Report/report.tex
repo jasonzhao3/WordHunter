@@ -38,7 +38,7 @@ The first step is to apply locally adaptive thresholding algorithm in order to s
 
 The idea of locally adaptive thresholding is divide the image into blocks/windows.  For each block, use grayscale variance to determine whether the block is uniform.  If the block is non-uniform (high variance), apply Otsu's method/global thresholding to the block; if the block is uniform (low variance), classify the entire block as all black or all white based on the mean grayscale value.  The reason not to apply Otsu's method to every block is because some blocks maybe entirely background with a number of noise pixels, Ostu's method will keep the noise pixels while classifying the entire block as background will eliminate noise.
 
-We applied OpenCV function adaptiveThreshold for binarization.  We also observed that a blockSize of 41 yields the best thresholding result.  See Figure~\ref{noskew} and Figure~\ref{noskewbinarized} for an example of image before and after binarization.
+We applied OpenCV function adaptiveThreshold for binarization.  We also observed that a blockSize of 51 yields the best thresholding result.  See Figure~\ref{noskew} and Figure~\ref{noskewbinarized} for an example of image before and after binarization.
 
 \begin{figure}
 \center
@@ -91,20 +91,19 @@ The implementation was done by creating a map with keys being the areas of the b
 The function calculates the values for a few important parameters including:
 \begin{itemize}
 \item cArea: The mean calculated from the ten most frequent area values.
-\item cHeight: An estimate of average height of letters, calculated from $\sqrt{\mbox{cArea}}$ mutiplied by a constant factor to take into account that most letters have larger height than width.
-\item cWidth: An estimate of average width of letters, calculated from $\sqrt{\mbox{cArea}}$ multiplied by a constant factor to take into account that most letters have larger width than height.
+\item cHeight: An estimate of average height of letters, calculated from $\sqrt{\mbox{cArea}}$ mutiplied by a constant factor 1.1 to take into account that most letters have larger height than width.
+\item cWidth: An estimate of average width of letters, calculated from $\sqrt{\mbox{cArea}}$ multiplied by a constant factor 0.75 to take into account that most letters have larger width than height.
 \end{itemize}
+The constant factors are tuned so that the algorithm works for the majority of test cases.
 
 \subsubsection{Find Neighbour}
 We implemented isNeighbour to determine whether two letters are next to each other in the same word.  This is the key logic in determining which letter bounding boxes to merge together into a word bounding box.  Two bounding boxes need to satisfy both conditions below in order to be called neighbours:
 \begin{itemize}
-\item The x-coordinate of the right edge of box 1 and the x-coordinate of the left edge of box 2 are off by at most $0.45 \times \mbox{cWidth}$ (box 1 is to the left of box 2); or vice versa, the x-coordinate of the left edge of box 1 and the x-coordinate of the right edge of box 2 are off by at most $0.45 \times \mbox{cWidth}$ (box 1 is to the right of box 2).  The factor 0.45 is the parameter that gives the best results after several experiments.
-\item  Because different letters have different heights, we decided to use the y-coordinate of the bottom edge to determine whether two boxes are on the same row.  The y-coordinates of the bottom edges of the two boxes needs to be within $0.35 \times \mbox{cHeight}$ of each other.
-
-In addition, we also want to combine the dot in lower case ``i'' and ``j'', therefore we allow the case where the y-coordinates of the top edges are within $0.25 \times \mbox{cHeight}$.
-
-The factors 0.35 and 0.25 are also parameters that are observed to give the best results after several experiments.
+\item The x-coordinate of the right edge of box 1 and the x-coordinate of the left edge of box 2 are off by at most $0.32 \times \mbox{cWidth}$ (box 1 is to the left of box 2); or vice versa, the x-coordinate of the left edge of box 1 and the x-coordinate of the right edge of box 2 are off by at most $0.32 \times \mbox{cWidth}$ (box 1 is to the right of box 2).  The factor 0.45 is the parameter that gives the best results after several experiments.
+\item  Because different letters have different heights, we decided to use the y-coordinate of the bottom edge to determine whether two boxes are on the same row.  The y-coordinates of the bottom edges of the two boxes needs to be within $0.32 \times \mbox{cHeight}$ of each other.
+\item  In addition, we also want to combine the dot in lower case ``i'' and ``j'', therefore we allow the case where the y-coordinates of the top edges are within $0.28 \times \mbox{cHeight}$.
 \end{itemize}
+The constant factors are tuned so that the algorithm works for the majority of test cases.
 
 See Figure~\ref{wordbbox} for an example of segmentation by word.
 
