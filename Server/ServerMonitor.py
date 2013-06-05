@@ -1,13 +1,19 @@
+##########################################
+# Author: Yang Zhao (yzhao3@stanford.edu) 
+# Mentor: David Chen, Sam Tsai 
+##########################################
+
 import os
 import string
 import time
 
+print('Server monitor program starts!')
 while (True):
 	# % Wait until image is ready
     imageReadyFile = './upload/image_ready';
     if not os.path.exists(imageReadyFile): 
-        time.sleep(0.01);
-        print('Waiting for image-is-ready signal');
+        #time.sleep(0.1);
+        #print('Waiting for image-is-ready signal');
         continue;
     
     # % Read input image file
@@ -16,32 +22,19 @@ while (True):
     root, ext = os.path.splitext(imageFile);
     fid.close();
     
+    # get pathname, filename, wordToSearch
     lastSlash = root.rfind("/");
     pathStr = root[:lastSlash];
     name = root[lastSlash+1 :];
-
     wordToSearch = ext.split('jpg')[1];
-    print("the word to search is : " + wordToSearch);
-
-
-    # [pathStr, name, ext] = fileparts(imageFile);
-    print('Processing image: ' +  imageFile);
+    #print("the word to search is : " + wordToSearch);
+    #print('Processing image: ' +  imageFile);
     
     # % Remove image-is-ready file
     os.remove(imageReadyFile);
     
-    # # % Call SIFT keypoint extractor
-    # if ext(1) ~= '.'
-    #     ext = ['.' ext];
-    # end
-
     inputImageFile = './upload/' + name + '.jpg';
-    #outputImageFile = './output/processed_' + name + '.jpg';
-# %     
-# %     img = imread(inputImageFile);
-# %     img_histogram = imhist(img);
-# %     imwrite(img_histogram, outputImageFile);
-
+    # call extract_text executable  
     cmd = './extract_text/extract_text ' + inputImageFile + ' ' + wordToSearch;
     os.system(cmd);
     
