@@ -1,3 +1,12 @@
+/** 
+ * Extract_text
+ * -------------------------------------
+ * Author:  Yang Zhao (yzhao3@stanford.edu) 
+ * Author2: Shuo Liu
+ * Mentor:  David Chen & Sam Tsai
+ * -------------------------------------
+ */
+
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
@@ -57,7 +66,9 @@ static vector<Rect> labelLettersWithBox(Mat &letterWithBox, vector<vector<Point>
 static void mergeBox(vector<Rect> & boundRect, int & cHeight, int & cWidth);
 static void searchAndLabelWord(Mat & resultImage, Mat & bb_mask, Mat & wordWithBox, Mat & bwImageForTess, \
                        vector<Rect> & boundRect, string & wordToSearch, int & widthLimit);
-static void deskewText(Mat & src, Mat & deskewedImg, Mat & color_src, Mat & color_deskew, Mat & rot_mat_inv, int & top, int & bottom, int & left, int & right, double & angle_degrees);
+static void deskewText(Mat & src, Mat & deskewedImg, Mat & color_src, Mat & color_deskew, \
+                      Mat & rot_mat_inv, int & top, int & bottom, int & left, int & right, \
+                      double & angle_degrees);
 static int findEditDistance(const string str1, const string str2, int cutoff, int order);
 
 
@@ -89,6 +100,7 @@ int main(int argc, char** argv)
   adaptiveThreshold(filteredImage, bwImage, 255, ADAPTIVE_THRESH_MEAN_C,\
 		    THRESH_BINARY_INV, blkSize, 10);
   deskewText(bwImage, deskewedImage, image, color_deskew, rot_mat_inv, top, bottom, left, right, angle_degrees);
+  //kinda ugly code here, need to be fixed later
    if (abs(angle_degrees) > ANGLE_THRESH) { 
           Mat bb_mask_inv;
           Mat bb_mask_inv_cropped; 
@@ -140,10 +152,7 @@ int main(int argc, char** argv)
        //  imwrite("word_with_bounding_box.jpg", wordWithBox);
   } else {
           Mat bb_mask_inv;
-          Mat bb_mask_inv_cropped; 
           Mat bb_mask(bwImage.rows, bwImage.cols, CV_8UC3, Scalar(0,0,0));
-
-           //deskewedImage = bwImage;
 
           Mat bwImageForTess = bwImage.clone();
           //add bounding box
@@ -207,7 +216,10 @@ static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth)
   else return false;
 }
 
-
+/** Function: findCharSize
+ * ------------------------
+ *  Estimate the character size based on the occurence statistics
+ */
 static void findCharSize(vector<Rect> & boundRect, int & cHeight, \
                       int & cWidth, float & cArea, int & widthLimit, int & numLetters) {
   map<int, int> areaMap;	// key: area_value  value: frequency
@@ -242,7 +254,11 @@ static void mergeBoundRect(vector<Rect> & boundRect,int & index1, int & index2) 
   boundRect.push_back(newRect);
 }
 
-
+/**
+ * Function: clearNullRect
+ * -----------------------
+ * Clear up too small or too big region that could not be a word
+ */
 static void clearNullRect(vector<Rect> & boundRect, float & cArea){
   for (int i = 0; i < boundRect.size(); i++) {
       float area = boundRect[i].area();
@@ -268,6 +284,12 @@ static void writeFile(string & sResult) {
 	myFile.close();
 }
 
+/**
+ * Function: addPadding
+ * ----------------------
+ * add black padding surrounding the word
+ * to improve the accuracy of Tesseract
+ */
 static Mat addPadding(Mat & wordWindow) {
   Mat wordWindowWithPadding;
   int top, bottom, left, right;
@@ -284,9 +306,12 @@ static Mat addPadding(Mat & wordWindow) {
   return wordWindowWithPadding;
 }
 
-
+/** 
+ * Function: isMatch
+ * -------------------
+ * Check whether a match is hit based on edit-distance
+ */
 static int isMatch(string &sResult, string &wordToSearch) {
-  //may need change to use edit distance
   int dis = findEditDistance(sResult, wordToSearch, (int)wordToSearch.length() * 0.3, 0);
   float ratio = (float) dis / wordToSearch.length();
   // cout << "Ratio between " << sResult << " and " << wordToSearch << " = " <<  ratio << endl;
@@ -323,8 +348,11 @@ static int findEditDistance(const string str1, const string str2, int cutoff, in
 }
 
 
-
-
+/**
+ * Function: withinLengthRange
+ * -----------------------------
+ * Used to filter out too-long or too-short words
+ */
 static bool withinLengthRange(Rect & rectBox, int & widthLimit) {
   float width = rectBox.width;
   if (width > 0.1 * widthLimit && width < 1.7 * widthLimit) 
