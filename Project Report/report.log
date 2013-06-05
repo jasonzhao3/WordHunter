@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2012.9.8)  2 JUN 2013 20:31
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2012.9.8)  4 JUN 2013 22:32
 entering extended mode
 **report.tex
 ("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.tex"
@@ -184,59 +184,79 @@ File: demo.jpg Graphic file (type jpg)
 Package pdftex.def Info: demo.jpg used on input line 30.
 (pdftex.def)             Requested size: 216.80946pt x 145.66885pt.
 
-<no_skew.jpg, id=2, 602.25pt x 803.0pt>
-File: no_skew.jpg Graphic file (type jpg)
- <use no_skew.jpg>
-Package pdftex.def Info: no_skew.jpg used on input line 45.
-(pdftex.def)             Requested size: 150.56212pt x 200.74951pt.
+<test261.jpg, id=2, 1284.8pt x 963.6pt>
+File: test261.jpg Graphic file (type jpg)
+ <use test261.jpg>
+Package pdftex.def Info: test261.jpg used on input line 45.
+(pdftex.def)             Requested size: 192.71169pt x 144.53375pt.
 
-<no_skew_binarized.jpg, id=3, 602.25pt x 803.0pt>
-File: no_skew_binarized.jpg Graphic file (type jpg)
- <use no_skew_binarized.jpg>
-Package pdftex.def Info: no_skew_binarized.jpg used on input line 52.
-(pdftex.def)             Requested size: 150.56212pt x 200.74951pt.
+<src_image.jpg, id=3, 1284.8pt x 963.6pt>
+File: src_image.jpg Graphic file (type jpg)
+ <use src_image.jpg>
+Package pdftex.def Info: src_image.jpg used on input line 52.
+(pdftex.def)             Requested size: 192.71169pt x 144.53375pt.
+
+<deskewedImage.jpg, id=4, 2312.64pt x 1734.48pt>
+File: deskewedImage.jpg Graphic file (type jpg)
+ <use deskewedImage.jpg>
+Package pdftex.def Info: deskewedImage.jpg used on input line 63.
+(pdftex.def)             Requested size: 231.27754pt x 173.45816pt.
 
 [1{C:/Users/lz7/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
 
 
  <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/demo.jpg> <C:/Users/l
-z7/Documents/GitHub/WordHunter/Project Report/no_skew.jpg>]
-<binarized.jpg, id=12, 803.0pt x 602.25pt>
-File: binarized.jpg Graphic file (type jpg)
- <use binarized.jpg>
-Package pdftex.def Info: binarized.jpg used on input line 63.
-(pdftex.def)             Requested size: 120.4448pt x 90.33359pt.
-
-<deskewedImage.jpg, id=13, 1284.8pt x 1084.05pt>
-File: deskewedImage.jpg Graphic file (type jpg)
- <use deskewedImage.jpg>
-Package pdftex.def Info: deskewedImage.jpg used on input line 70.
-(pdftex.def)             Requested size: 192.71169pt x 162.60048pt.
-
-<letter_with_bounding_box.jpg, id=14, 1084.05pt x 1445.4pt>
+z7/Documents/GitHub/WordHunter/Project Report/test261.jpg>]
+<letter_with_bounding_box.jpg, id=13, 2312.64pt x 1734.48pt>
 File: letter_with_bounding_box.jpg Graphic file (type jpg)
 
 <use letter_with_bounding_box.jpg>
-Package pdftex.def Info: letter_with_bounding_box.jpg used on input line 84.
-(pdftex.def)             Requested size: 162.60048pt x 216.80064pt.
+Package pdftex.def Info: letter_with_bounding_box.jpg used on input line 77.
+(pdftex.def)             Requested size: 231.27754pt x 173.45816pt.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 100.
+(Font)              <7> on input line 93.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 100.
- [2 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/no_skew_binarized.
-jpg> <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/binarized.jpg> <C
-:/Users/lz7/Documents/GitHub/WordHunter/Project Report/deskewedImage.jpg> <C:/U
-sers/lz7/Documents/GitHub/WordHunter/Project Report/letter_with_bounding_box.jp
-g>]
-<word_with_bounding_box.jpg, id=20, 1084.05pt x 1445.4pt>
+(Font)              <5> on input line 93.
+ [2 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/src_image.jpg> <C:
+/Users/lz7/Documents/GitHub/WordHunter/Project Report/deskewedImage.jpg> <C:/Us
+ers/lz7/Documents/GitHub/WordHunter/Project Report/letter_with_bounding_box.jpg
+>]
+<word_with_bounding_box.jpg, id=21, 2312.64pt x 1734.48pt>
 File: word_with_bounding_box.jpg Graphic file (type jpg)
 
 <use word_with_bounding_box.jpg>
-Package pdftex.def Info: word_with_bounding_box.jpg used on input line 120.
-(pdftex.def)             Requested size: 162.60048pt x 216.80064pt.
+Package pdftex.def Info: word_with_bounding_box.jpg used on input line 112.
+(pdftex.def)             Requested size: 231.27754pt x 173.45816pt.
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+<bb_mask_inv_cropped.jpg, id=22, 1284.8pt x 963.6pt>
+File: bb_mask_inv_cropped.jpg Graphic file (type jpg)
 
+<use bb_mask_inv_cropped.jpg>
+Package pdftex.def Info: bb_mask_inv_cropped.jpg used on input line 128.
+(pdftex.def)             Requested size: 192.71169pt x 144.53375pt.
+ <result_image.jpg, id=23, 1284.8pt x 963.6pt>
+File: result_image.jpg Graphic file (type jpg)
+
+<use result_image.jpg>
+Package pdftex.def Info: result_image.jpg used on input line 135.
+(pdftex.def)             Requested size: 192.71169pt x 144.53375pt.
+Missing character: There is no â in font ptmr7t!
+Missing character: There is no € in font ptmr7t!
+Missing character: There is no ™ in font ptmr7t!
+ [3 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/word_with_bounding
+_box.jpg> <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/bb_mask_inv_
+cropped.jpg> <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/result_im
+age.jpg>]
+<server_client_connection.jpg, id=27, 1806.75pt x 1293.83376pt>
+File: server_client_connection.jpg Graphic file (type jpg)
+
+<use server_client_connection.jpg>
+Package pdftex.def Info: server_client_connection.jpg used on input line 149.
+(pdftex.def)             Requested size: 271.00081pt x 194.06668pt.
+
+Overfull \hbox (19.00081pt too wide) in paragraph at lines 149--150
+ [] 
+ []
 
 
 ** Conference Paper **
@@ -249,17 +269,19 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[3 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/word_with_bounding_
-box.jpg>] ("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.aux"
+[4
+
+ <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/server_client_connect
+ion.jpg>] ("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.aux"
 ) ) 
 Here is how much of TeX's memory you used:
- 1850 strings out of 494045
- 29434 string characters out of 3148394
- 84140 words of memory out of 3000000
- 5175 multiletter control sequences out of 15000+200000
+ 1862 strings out of 494045
+ 29735 string characters out of 3148394
+ 85156 words of memory out of 3000000
+ 5185 multiletter control sequences out of 15000+200000
  33007 words of font info for 62 fonts, out of 3000000 for 9000
  715 hyphenation exceptions out of 8191
- 27i,8n,19p,711b,242s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 27i,8n,19p,925b,242s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Program Fil
 es/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files/MiKTe
 X 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX 2.9/fon
@@ -268,9 +290,9 @@ ts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1
 s/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmbi8a.pfb><C:
 /Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/Mi
 KTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (3 pages, 1633359 bytes).
+Output written on report.pdf (4 pages, 3346675 bytes).
 PDF statistics:
- 52 PDF objects out of 1000 (max. 8388607)
+ 57 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 36 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 46 words of extra memory for PDF output out of 10000 (max. 10000000)
 
