@@ -40,6 +40,8 @@ The idea of locally adaptive thresholding is divide the image into blocks/window
 
 We applied OpenCV function adaptiveThreshold for binarization.  We also observed that a blockSize of 51 yields the best thresholding result.  See Figure~\ref{noskew} and Figure~\ref{noskewbinarized} for an example of image before and after binarization.
 
+We also performed, as part of the binarization step, a median filtering with a kernel size of 3 to eliminate any salt-and-pepper noise.  This will improve the accuracy of the character size detection.
+
 \begin{figure}
 \center
 \includegraphics[scale=0.15]{test261.jpg}
@@ -57,6 +59,10 @@ We applied OpenCV function adaptiveThreshold for binarization.  We also observed
 \subsection{De-skew}
 
 Hough transform (OpenCV function HoughLinesP) is used to detect (text) lines in the image.  Then we rotate binarized image by the mean of the rotation angles calculated from each text line, we call OpenCV function getRotationMatrix2D to do it.  We also need to make sure not to cut off corners in the rotation process, therefore we need to pad the binarized image before rotating.  See Figure~\ref{deskewed} for an example of image before and after de-skew.  Notice that Figure~\ref{deskewed} is slightly larger than images above because of padding.
+
+Observing that Tesseract does a decent job for images skewed by less than 5 degrees, we have included logic to bypass de-skew image rotation for such images.  This improves accuracy because image rotation lowers image quality because of interpolation.  By skipping rotation, we essentially preserve more details in the image and therefore boost performance for images with a small skew.
+
+We can see evidence of improvement in Figure~\ref{accuracybyangle}, where 0-degree test cases have better performance than others.  Even though theoretically 0-degree test cases should not be affected by image rotation if the skew is exactly 0 degree, we performed testing by hand-holding the device, which can introduce skew of a few degrees.  Therefore skipping the rotation step can save us from the interpolation effect and boost performance.
 
 \begin{figure}
 \center
@@ -121,7 +127,7 @@ Exact or non-exact matches is determined by the ratio between edit distance (or 
 
 Levenshtein distance is defined to be the minimum number of single-letter operations (insertion, deletion or substitution) needed to transform one string into another.  For example, to change ``abcd'' into ``bcda'', one can either change each letter (change the first letter ``a'' to ``b'', the second letter ``b'' to ``c'', the third letter ``c'' to ``d'', the fourth letter ``d'' to ``a'' ), which has a total of four operations, or delete the ``a'' from the beginning of the string and add an ``a'' to the end of it, which has a total of two operations.  Therefore the Levenshtein distance between the two strings is two.  The distance can be calculated between any two strings using recursion.
 
-Finally we draw rectangular boxes of different colors (in order to differentiate between exact matches and close matches) at the coordinates where we find matches, and then overlay the image onto the orginal image.  See Figure~\ref{boxes_overlay} and Figure~\ref{result_image} for illustration of searching and labeling keyword matches.
+Finally we draw rectangular boxes of different colors (in order to differentiate between exact matches and close matches) at the coordinates where we find matches, and then overlay the rectangles onto the orginal image.  See Figure~\ref{boxes_overlay} and Figure~\ref{result_image} for illustration of searching and labeling keyword matches.
 
 \begin{figure}
 \center
@@ -153,10 +159,34 @@ On the client side, WordHunter has two modes. The first mode, snap mode, takes a
 
 
 \section{Emperical Results}
+We tested the keyword recognition rate with more than 100 data points.  The sample space covers different skew angles (0 degree, 15 degrees and 30 degrees), and different word lengths, because we believe that those are the two main factors that can affect performance.    The overall accuracy is 89.7\%, and we have included a breakdown by word length and skew angle (Figure\ref{accuracybylength} and Figure \ref{accuracybyangle}).
+
+From the breakdown by keyword length, we can observe that although accuracy varies for different word lengths, there is no clear trend that performance improves/deteriorates as keyword length increases/decreases, which is desirable.  Variation does exist but it is largely due to the relatively small sample size, we would like to perform most testing if time permits.
+
+From the breakdown by skew angle, notice that there is a slight deterioration in performance due to the skew.  We have investigated this by looking at the intermediate steps/results on the algorithm and concluded that the de-skew algorithm works reasonably well, the deterioration is mostly due to the fact that image rotation lowers the image quality and there is not much we can do about it.  We also noticed that there is very little change in performance from 15-degree skew to 30-degree skew, which is desirable.
+
+We have also noticed (by examining the test input and output images) that results may vary due to uneven line spacing, different fonts, and image quality.  De-focus and blur due to hand shaking account for a large proportion of inaccuracies.
+
+\begin{figure}
+\center
+\includegraphics[scale=0.25]{accuracy_by_length.jpg}
+\caption{Accuracy By Keyword Length}
+\label{accuracybylength}
+\end{figure}
+
+\begin{figure}
+\center
+\includegraphics[scale=0.25]{accuracy_by_angle.jpg}
+\caption{Accuracy By Skew Angle}
+\label{accuracybyangle}
+\end{figure}
+
 
 \section*{Acknowledgment}
 We would like to thank David Chen and Sam Tsai for their generous and responsive help on the project.  We would also like to thank Professor Girod for his inspiring lectures.
 
+\section*{Appendix}
+The team worked together on the image processing algorithm.  In addition, Yang prototyped the Andriod app and server code, Shuo worked on the app as well as integration, Lingren worked on reporting.
 
 %\begin{thebibliography}{1}
 %\bibitem{IEEEhowto:kopka}
