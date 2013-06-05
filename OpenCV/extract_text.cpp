@@ -33,6 +33,16 @@ static inline string to_string (const T& t)
 }
 
 
+static inline int min(int dis1, int dis2, int dis3) {
+    int dis[3] = {dis1, dis2, dis3};
+    int minTmp = dis1;
+    for (int i = 1; i < 3; i++) {
+       minTmp = minTmp < dis[i] ? minTmp : dis[i];
+    }
+    return minTmp;
+}
+
+
 static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth);
 static void findCharSize(vector<Rect> & boundRect, int & cHeight,int & cWidth, \
                         float & cArea, int & widthLimit, int & numLetters);
@@ -49,7 +59,7 @@ static void searchAndLabelWord(Mat & resultImage, Mat & bb_mask, Mat & wordWithB
                        vector<Rect> & boundRect, string & wordToSearch, int & widthLimit);
 static void deskewText(Mat & src, Mat & deskewedImg, Mat & color_src, Mat & color_deskew, Mat & rot_mat_inv, int & top, int & bottom, int & left, int & right, double & angle_degrees);
 static int findEditDistance(const string str1, const string str2, int cutoff, int order);
-static int min(int dis1, int dis2, int dis3);
+
 
 int main(int argc, char** argv)
 {
@@ -57,10 +67,12 @@ int main(int argc, char** argv)
   Mat  color_deskew, color_deskew_inv, color_deskew_inv_cropped, rot_mat_inv;
   int top, bottom, left, right;
   double angle_degrees;
-  if (argc != 3) {
-    printf("Incorrect input. Please enter: executable + imageFileName + wordToSearch\n");
-    return -1;
-  }
+  /* The following code is for server-side debug use */
+  // if (argc != 3) {
+  //   printf("Incorrect input. Please enter: executable + imageFileName + wordToSearch\n");
+  //   return -1;
+  // }
+
   //get input information
   image = imread (argv[1], 1);
   string wordToSearch = argv[2];
@@ -73,9 +85,6 @@ int main(int argc, char** argv)
   // rgb2gray
   cvtColor(image, grayImage, CV_RGB2GRAY);
   medianBlur(grayImage, filteredImage, 3);
-  //filteredImage = grayImage;
-  // equalize the image
-  equalizeHist(grayImage, equalImage);
   // gray2bw
   adaptiveThreshold(filteredImage, bwImage, 255, ADAPTIVE_THRESH_MEAN_C,\
 		    THRESH_BINARY_INV, blkSize, 10);
@@ -86,9 +95,6 @@ int main(int argc, char** argv)
           Mat bb_mask(color_deskew.rows, color_deskew.cols, CV_8UC3, Scalar(255,255,255));
 
            //deskewedImage = bwImage;
-
-
-
           Mat bwImageForTess = deskewedImage.clone();
           //add bounding box
           cvtColor(deskewedImage, wordWithBox, CV_GRAY2RGB, 0);
@@ -97,7 +103,6 @@ int main(int argc, char** argv)
           vector<vector<Point> > contours;
           Mat contourImage;
           cvtColor(deskewedImage, contourImage, CV_GRAY2RGB, 0);  
-          //findContours(deskewedImage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
           findContours(deskewedImage, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
 //           for (int i = 0; i < contours.size(); i++) {
 //             drawContours(contourImage, contours, i, Scalar(255, 0, 0), 1, 8, hierarchy, 0, Point());
@@ -130,17 +135,15 @@ int main(int argc, char** argv)
           //imwrite("result_image.jpg", resultImage);
           imwrite("./output/bb_mask.jpg", bb_mask_inv_cropped);
           imwrite("./output/result_image.jpg", color_deskew_inv_cropped);
-          //imwrite("color_deskew_inv.jpg", color_deskew_inv);
-//          imwrite("letter_with_bounding_box.jpg", letterWithBox);
-//          imwrite("word_with_bounding_box.jpg", wordWithBox);
+        //  imwrite("color_deskew_inv.jpg", color_deskew_inv);
+       //  imwrite("letter_with_bounding_box.jpg", letterWithBox);
+       //  imwrite("word_with_bounding_box.jpg", wordWithBox);
   } else {
           Mat bb_mask_inv;
           Mat bb_mask_inv_cropped; 
           Mat bb_mask(bwImage.rows, bwImage.cols, CV_8UC3, Scalar(0,0,0));
 
            //deskewedImage = bwImage;
-
-
 
           Mat bwImageForTess = bwImage.clone();
           //add bounding box
@@ -150,7 +153,6 @@ int main(int argc, char** argv)
           vector<vector<Point> > contours;
           Mat contourImage;
           cvtColor(bwImage, contourImage, CV_GRAY2RGB, 0);  
-          //findContours(bwImage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
           findContours(bwImage, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
 //           for (int i = 0; i < contours.size(); i++) {
 //             drawContours(contourImage, contours, i, Scalar(255, 0, 0), 1, 8, hierarchy, 0, Point());
@@ -175,8 +177,8 @@ int main(int argc, char** argv)
           //imwrite("result_image.jpg", resultImage);
           imwrite("./output/bb_mask.jpg", bb_mask);
           imwrite("./output/result_image.jpg", resultImage);
-//          imwrite("letter_with_bounding_box.jpg", letterWithBox);
-//          imwrite("word_with_bounding_box.jpg", wordWithBox);
+         //imwrite("letter_with_bounding_box.jpg", letterWithBox);
+         //imwrite("word_with_bounding_box.jpg", wordWithBox);
   }
   printf("image saved successfully.\n");
   waitKey(0);
@@ -201,7 +203,7 @@ static bool isNeighbour(Rect & rect1, Rect & rect2, int & cHeight, int & cWidth)
   //two dx is because when the bounding box becomes a rectangule, the original dx will not work anymore
   //two rectangles intersect
   if ((rect1 & rect2).area() != 0 ) return true;
-  if ((dy < 0.65 * cHeight || dy1 < 0.28 * cHeight || dy2 < 0.32 * cHeight)  && (dx1 < 0.32 * cWidth || dx2 < 0.32 *cWidth)) return true;
+  if ((dy < 0.65 * cHeight || dy1 < 0.28 * cHeight || dy2 < 0.32 * cHeight)  && (dx1 < 0.31 * cWidth || dx2 < 0.31 *cWidth)) return true;
   else return false;
 }
 
@@ -287,8 +289,7 @@ static int isMatch(string &sResult, string &wordToSearch) {
   //may need change to use edit distance
   int dis = findEditDistance(sResult, wordToSearch, (int)wordToSearch.length() * 0.3, 0);
   float ratio = (float) dis / wordToSearch.length();
-  // cout << "Ratio between " << sResult << " and " << wordToSearch << " = " << dis << "/" <<wordToSearch.length() << " = " << ratio << endl;
-  cout << "Ratio between " << sResult << " and " << wordToSearch << " = " <<  ratio << endl;
+  // cout << "Ratio between " << sResult << " and " << wordToSearch << " = " <<  ratio << endl;
   if (dis == 0) {
           cout << " Match is red"<< endl;
           return 0;
@@ -321,21 +322,12 @@ static int findEditDistance(const string str1, const string str2, int cutoff, in
     return -1; //error flag
 }
 
-static int min(int dis1, int dis2, int dis3) {
-    int dis[3] = {dis1, dis2, dis3};
-    int minTmp = dis1;
-    for (int i = 1; i < 3; i++) {
-       minTmp = minTmp < dis[i] ? minTmp : dis[i];
-    }
-    return minTmp;
-}
-
 
 
 
 static bool withinLengthRange(Rect & rectBox, int & widthLimit) {
   float width = rectBox.width;
-  if (width > 0.65 * widthLimit && width < 1.7 * widthLimit) 
+  if (width > 0.1 * widthLimit && width < 1.7 * widthLimit) 
     return true;
   else 
     return false;
@@ -370,8 +362,7 @@ static void searchAndLabelWord(Mat & resultImage, Mat & bb_mask, Mat & wordWithB
   int rectNum = boundRect.size();
   Scalar color = Scalar(0,0,255);
   for (int i = 0; i < rectNum; i++) {
-      if (1) {
-      //if (withinLengthRange(boundRect[i], widthLimit)) {
+      if (withinLengthRange(boundRect[i], widthLimit)) {
         Mat wordWindow(bwImageForTess, boundRect[i]);
         Mat wordWindowWithPadding = addPadding(wordWindow);
         //string wordWindowName = "word_" + to_string(i) + ".jpg";
@@ -475,7 +466,7 @@ static void deskewText(Mat & src, Mat & deskewedImg, Mat & color_src, Mat & colo
           RotatedRect box = minAreaRect(Mat(points));
           Mat rot_mat = getRotationMatrix2D(box.center, angle_degrees, 1);
           invertAffineTransform(rot_mat, rot_mat_inv);
-          std::cout << "rotation matrix = " << std::endl << " " << rot_mat << std::endl << std::endl;
+          //std::cout << "rotation matrix = " << std::endl << " " << rot_mat << std::endl << std::endl;
 
           Mat se = getStructuringElement(MORPH_ELLIPSE, Size(3,3));  
           Mat color_deskew_inv; 
