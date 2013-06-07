@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2012.9.8)  5 JUN 2013 09:19
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2012.9.8)  6 JUN 2013 21:20
 entering extended mode
 **report.tex
 ("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.tex"
@@ -130,150 +130,147 @@ Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
 \Gin@req@height=\dimen117
 \Gin@req@width=\dimen118
 )
+(C:\Users\lz7\AppData\Roaming\MiKTeX\2.9\tex\latex\natbib\natbib.sty
+Package: natbib 2010/09/13 8.31b (PWD, AO)
+\bibhang=\skip44
+\bibsep=\skip45
+LaTeX Info: Redefining \cite on input line 694.
+\c@NAT@ctr=\count93
+)
 ("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.aux")
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 3.
-LaTeX Font Info:    ... okay on input line 3.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 3.
-LaTeX Font Info:    ... okay on input line 3.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 3.
-LaTeX Font Info:    ... okay on input line 3.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 3.
-LaTeX Font Info:    ... okay on input line 3.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 3.
-LaTeX Font Info:    ... okay on input line 3.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 3.
-LaTeX Font Info:    ... okay on input line 3.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 4.
+LaTeX Font Info:    ... okay on input line 4.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 4.
+LaTeX Font Info:    ... okay on input line 4.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 4.
+LaTeX Font Info:    ... okay on input line 4.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 4.
+LaTeX Font Info:    ... okay on input line 4.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 4.
+LaTeX Font Info:    ... okay on input line 4.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 4.
+LaTeX Font Info:    ... okay on input line 4.
 
 (C:\Users\lz7\AppData\Roaming\MiKTeX\2.9\tex\context\base\supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count93
+\scratchcounter=\count94
 \scratchdimen=\dimen119
 \scratchbox=\box27
-\nofMPsegments=\count94
-\nofMParguments=\count95
+\nofMPsegments=\count95
+\nofMParguments=\count96
 \everyMPshowfont=\toks16
-\MPscratchCnt=\count96
+\MPscratchCnt=\count97
 \MPscratchDim=\dimen120
-\MPnumerator=\count97
-\makeMPintoPDFobject=\count98
+\MPnumerator=\count98
+\makeMPintoPDFobject=\count99
 \everyMPtoPDFconversion=\toks17
 )
-Missing character: There is no ‚ in font ptmr7t!
-Missing character: There is no Ä in font ptmr7t!
-Missing character: There is no ô in font ptmr7t!
-Missing character: There is no ‚ in font ptmr7t!
-Missing character: There is no Ä in font ptmr7t!
-Missing character: There is no ú in font ptmr7t!
-Missing character: There is no ‚ in font ptmr7t!
-Missing character: There is no Ä in font ptmr7t!
-Missing character: There is no ù in font ptmr7t!
-Missing character: There is no ‚ in font ptmr7t!
-Missing character: There is no Ä in font ptmr7t!
-Missing character: There is no ú in font ptmr7t!
-Missing character: There is no ‚ in font ptmr7t!
-Missing character: There is no Ä in font ptmr7t!
-Missing character: There is no ù in font ptmr7t!
-
-Underfull \hbox (badness 10000) in paragraph at lines 26--27
+Underfull \hbox (badness 10000) in paragraph at lines 21--22
 
  []
 
-<demo.jpg, id=1, 433.62pt x 291.33844pt>
-File: demo.jpg Graphic file (type jpg)
- <use demo.jpg>
-Package pdftex.def Info: demo.jpg used on input line 30.
-(pdftex.def)             Requested size: 216.80946pt x 145.66885pt.
+<demo_no_skew.jpg, id=1, 2457.18pt x 3276.24pt>
+File: demo_no_skew.jpg Graphic file (type jpg)
+ <use demo_no_skew.jpg>
+Package pdftex.def Info: demo_no_skew.jpg used on input line 25.
+(pdftex.def)             Requested size: 184.28055pt x 245.7074pt.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 32.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 32.
+
+
+Package natbib Warning: Citation `Matas' on page 1 undefined on input line 32.
 
 <test261.jpg, id=2, 1284.8pt x 963.6pt>
 File: test261.jpg Graphic file (type jpg)
  <use test261.jpg>
-Package pdftex.def Info: test261.jpg used on input line 47.
+Package pdftex.def Info: test261.jpg used on input line 40.
 (pdftex.def)             Requested size: 192.71169pt x 144.53375pt.
 
 <src_image.jpg, id=3, 1284.8pt x 963.6pt>
 File: src_image.jpg Graphic file (type jpg)
  <use src_image.jpg>
-Package pdftex.def Info: src_image.jpg used on input line 54.
+Package pdftex.def Info: src_image.jpg used on input line 47.
 (pdftex.def)             Requested size: 192.71169pt x 144.53375pt.
- [1{C:/Users/lz7/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
 
 
- <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/demo.jpg> <C:/Users/l
-z7/Documents/GitHub/WordHunter/Project Report/test261.jpg>]
+Package natbib Warning: Citation `Tsai' on page 1 undefined on input line 54.
+
+[1{C:/Users/lz7/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
+
+
+ <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/demo_no_skew.jpg>]
 <deskewedImage.jpg, id=12, 2312.64pt x 1734.48pt>
 File: deskewedImage.jpg Graphic file (type jpg)
  <use deskewedImage.jpg>
-Package pdftex.def Info: deskewedImage.jpg used on input line 69.
+Package pdftex.def Info: deskewedImage.jpg used on input line 62.
 (pdftex.def)             Requested size: 231.27754pt x 173.45816pt.
 
 <letter_with_bounding_box.jpg, id=13, 2312.64pt x 1734.48pt>
 File: letter_with_bounding_box.jpg Graphic file (type jpg)
 
 <use letter_with_bounding_box.jpg>
-Package pdftex.def Info: letter_with_bounding_box.jpg used on input line 83.
+Package pdftex.def Info: letter_with_bounding_box.jpg used on input line 79.
 (pdftex.def)             Requested size: 231.27754pt x 173.45816pt.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 99.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 99.
- [2 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/src_image.jpg> <C:
-/Users/lz7/Documents/GitHub/WordHunter/Project Report/deskewedImage.jpg> <C:/Us
-ers/lz7/Documents/GitHub/WordHunter/Project Report/letter_with_bounding_box.jpg
->]
-<word_with_bounding_box.jpg, id=19, 2312.64pt x 1734.48pt>
+
+
+Package natbib Warning: Citation `Hampapur' on page 2 undefined on input line 8
+6.
+
+[2 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/test261.jpg> <C:/Us
+ers/lz7/Documents/GitHub/WordHunter/Project Report/src_image.jpg> <C:/Users/lz7
+/Documents/GitHub/WordHunter/Project Report/deskewedImage.jpg> <C:/Users/lz7/Do
+cuments/GitHub/WordHunter/Project Report/letter_with_bounding_box.jpg>]
+<word_with_bounding_box.jpg, id=17, 2312.64pt x 1734.48pt>
 File: word_with_bounding_box.jpg Graphic file (type jpg)
 
 <use word_with_bounding_box.jpg>
-Package pdftex.def Info: word_with_bounding_box.jpg used on input line 118.
+Package pdftex.def Info: word_with_bounding_box.jpg used on input line 113.
 (pdftex.def)             Requested size: 231.27754pt x 173.45816pt.
 
-<bb_mask_inv_cropped.jpg, id=20, 1284.8pt x 963.6pt>
+<bb_mask_inv_cropped.jpg, id=18, 1284.8pt x 963.6pt>
 File: bb_mask_inv_cropped.jpg Graphic file (type jpg)
 
 <use bb_mask_inv_cropped.jpg>
-Package pdftex.def Info: bb_mask_inv_cropped.jpg used on input line 134.
+Package pdftex.def Info: bb_mask_inv_cropped.jpg used on input line 129.
 (pdftex.def)             Requested size: 192.71169pt x 144.53375pt.
- <result_image.jpg, id=21, 1284.8pt x 963.6pt>
+ <result_image.jpg, id=19, 1284.8pt x 963.6pt>
 File: result_image.jpg Graphic file (type jpg)
 
 <use result_image.jpg>
-Package pdftex.def Info: result_image.jpg used on input line 141.
+Package pdftex.def Info: result_image.jpg used on input line 136.
 (pdftex.def)             Requested size: 192.71169pt x 144.53375pt.
-Missing character: There is no ‚ in font ptmr7t!
-Missing character: There is no Ä in font ptmr7t!
-Missing character: There is no ô in font ptmr7t!
  [3 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/word_with_bounding
-_box.jpg> <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/bb_mask_inv_
-cropped.jpg> <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/result_im
-age.jpg>]
+_box.jpg>]
 <server_client_connection.jpg, id=27, 1806.75pt x 1293.83376pt>
 File: server_client_connection.jpg Graphic file (type jpg)
 
 <use server_client_connection.jpg>
-Package pdftex.def Info: server_client_connection.jpg used on input line 155.
+Package pdftex.def Info: server_client_connection.jpg used on input line 150.
 (pdftex.def)             Requested size: 271.00081pt x 194.06668pt.
 
-Overfull \hbox (19.00081pt too wide) in paragraph at lines 155--156
+Overfull \hbox (19.00081pt too wide) in paragraph at lines 150--151
  [] 
  []
 
-<accuracy_by_length.jpg, id=28, 948.54375pt x 531.9875pt>
+[4 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/bb_mask_inv_cropped
+.jpg> <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/result_image.jpg
+> <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/server_client_connec
+tion.jpg>] <accuracy_by_length.jpg, id=31, 948.54375pt x 531.9875pt>
 File: accuracy_by_length.jpg Graphic file (type jpg)
 
 <use accuracy_by_length.jpg>
-Package pdftex.def Info: accuracy_by_length.jpg used on input line 172.
+Package pdftex.def Info: accuracy_by_length.jpg used on input line 167.
 (pdftex.def)             Requested size: 237.13535pt x 132.99655pt.
 
-<accuracy_by_angle.jpg, id=29, 948.54375pt x 533.995pt>
+<accuracy_by_angle.jpg, id=32, 948.54375pt x 533.995pt>
 File: accuracy_by_angle.jpg Graphic file (type jpg)
 
 <use accuracy_by_angle.jpg>
-Package pdftex.def Info: accuracy_by_angle.jpg used on input line 179.
+Package pdftex.def Info: accuracy_by_angle.jpg used on input line 174.
 (pdftex.def)             Requested size: 237.13535pt x 133.49841pt.
- [4 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/server_client_conn
-ection.jpg> <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/accuracy_b
-y_length.jpg> <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/accuracy
-_by_angle.jpg>]
+
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -285,27 +282,38 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[5
 
-] ("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.aux") ) 
+Package natbib Warning: There were undefined citations.
+
+[5 <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/accuracy_by_length.
+jpg> <C:/Users/lz7/Documents/GitHub/WordHunter/Project Report/accuracy_by_angle
+.jpg>] ("C:\Users\lz7\Documents\GitHub\WordHunter\Project Report\report.aux"
+
+Package natbib Warning: Citation(s) may have changed.
+(natbib)                Rerun to get citations correct.
+
+)
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ ) 
 Here is how much of TeX's memory you used:
- 1874 strings out of 494045
- 30023 string characters out of 3148394
- 85174 words of memory out of 3000000
- 5195 multiletter control sequences out of 15000+200000
- 33007 words of font info for 62 fonts, out of 3000000 for 9000
+ 2220 strings out of 494045
+ 34198 string characters out of 3148394
+ 94065 words of memory out of 3000000
+ 5536 multiletter control sequences out of 15000+200000
+ 34114 words of font info for 63 fonts, out of 3000000 for 9000
  715 hyphenation exceptions out of 8191
- 27i,8n,19p,925b,242s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/P
-rogram Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Program Files/MiKTe
-X 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files/MiKTeX 2.9/fo
-nts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1
-/public/amsfonts/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/
-amsfonts/cm/cmsy7.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmb8a
-.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmbi8a.pfb><C:/Program
- Files/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9
-/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (5 pages, 3417035 bytes).
+ 27i,8n,23p,1245b,240s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Program File
+s/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files/MiKTeX
+ 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX 2.9/font
+s/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/
+public/amsfonts/cm/cmsy7.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times
+/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmbi8a.pfb><C:/
+Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/MiK
+TeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
+Output written on report.pdf (5 pages, 5705866 bytes).
 PDF statistics:
  62 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
